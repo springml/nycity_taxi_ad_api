@@ -1,5 +1,6 @@
 package com.springml.nyc.taxi.ad.api;
 
+import com.springml.nyc.taxi.ad.api.model.CouponResponse;
 import com.springml.nyc.taxi.ad.api.model.RideDetails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,11 +22,19 @@ public class AdResource {
         return "Hello App Engine!";
     }
 
-    @RequestMapping(value = "/getAd", method = RequestMethod.POST)
-    public @ResponseBody ResponseEntity<String> getAd(@RequestBody RideDetails rideDetails) {
+    @RequestMapping(value = "/getCoupon", method = RequestMethod.POST)
+    public @ResponseBody ResponseEntity<CouponResponse> getCoupon(@RequestBody RideDetails rideDetails) {
         LOG.info("rideDetails : " + rideDetails);
-        int adId = adServer.getAd(rideDetails);
-        return ResponseEntity.ok("{\"adId\" : \"" + adId + "\"}");
+
+        int couponId = adServer.getCoupon(rideDetails);
+        String discount = adServer.getDiscount(couponId);
+
+        CouponResponse response = new CouponResponse();
+        response.setCouponId(couponId);
+        response.setDiscount(discount);
+        LOG.debug("Returning " + response);
+
+        return ResponseEntity.ok(response);
     }
 
     /**

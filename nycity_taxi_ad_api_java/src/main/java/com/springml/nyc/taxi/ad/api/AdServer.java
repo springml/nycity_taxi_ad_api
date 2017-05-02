@@ -9,11 +9,14 @@ import com.google.gson.Gson;
 import com.springml.nyc.taxi.ad.api.model.Prediction;
 import com.springml.nyc.taxi.ad.api.model.Predictions;
 import com.springml.nyc.taxi.ad.api.model.RideDetails;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 
+import javax.annotation.PostConstruct;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -28,8 +31,33 @@ public class AdServer {
     @Value("${cloudML.predict.rest.url}")
     private String predictRestUrl;
 
-    public int getAd(RideDetails rideDetails) {
+    @Value("${coupon.discount.map.file}")
+    private String discountMapFile;
+
+    private Properties discountProps;
+
+    @PostConstruct
+    private void initDiscountProperties() throws IOException {
+        discountProps = new Properties();
+        discountProps.load(this.getClass().getClassLoader().getResourceAsStream(discountMapFile));
+
+        LOG.info("Loaded coupon discount mapping");
+        LOG.info(discountProps.toString());
+    }
+
+    public int getCoupon(RideDetails rideDetails) {
         return getPredictedAd(rideDetails);
+    }
+
+    public String getDiscount(int couponId) {
+        String discount = discountProps.getProperty(Integer.toString(couponId));
+        if (StringUtils.isBlank(discount)) {
+            // Defaulting to 5%
+            discount = "5%";
+        }
+
+        LOG.info("Discount " + discount);
+        return discount;
     }
 
     private int getPredictedAd(RideDetails rideDetails) {
