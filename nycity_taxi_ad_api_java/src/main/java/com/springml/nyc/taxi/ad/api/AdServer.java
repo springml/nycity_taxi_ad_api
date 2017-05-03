@@ -65,8 +65,14 @@ public class AdServer {
             GoogleCredential credential = GoogleCredential.getApplicationDefault()
                     .createScoped(Collections.singleton(CLOUDML_SCOPE));
             HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
+            HttpRequestInitializer requestInitializer = request -> {
+                credential.initialize(request);
+                request.setReadTimeout(0);
+            };
+
             HttpRequestFactory requestFactory = httpTransport.createRequestFactory(
-                    credential);
+                    requestInitializer);
+
             GenericUrl url = new GenericUrl(predictRestUrl);
 
             JacksonFactory jacksonFactory = new JacksonFactory();
