@@ -1,3 +1,6 @@
 */*.iml
 nycity_taxi_ad_api_java/.idea/
 nycity_taxi_ad_api_java/target/
+coupon_service_simulator/target/
+coupon_service_simulator/coupon_service_simulator.iml
+coupon_service_simulator/.idea/
