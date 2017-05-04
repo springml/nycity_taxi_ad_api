@@ -12,6 +12,15 @@ public class Coupon {
     @JsonProperty("discount_percentage")
     private int discountPercentage;
 
+    @JsonProperty("business_type")
+    private String businessType;
+
+    @JsonProperty("business_name")
+    private String businessName;
+
+    @JsonProperty("coupon_image")
+    private String couponImage;
+
     public int getCouponId() {
         return couponId;
     }
@@ -28,11 +37,38 @@ public class Coupon {
         this.discountPercentage = discountPercentage;
     }
 
+    public String getBusinessType() {
+        return businessType;
+    }
+
+    public void setBusinessType(String businessType) {
+        this.businessType = businessType;
+    }
+
+    public String getBusinessName() {
+        return businessName;
+    }
+
+    public void setBusinessName(String businessName) {
+        this.businessName = businessName;
+    }
+
+    public String getCouponImage() {
+        return couponImage;
+    }
+
+    public void setCouponImage(String couponImage) {
+        this.couponImage = couponImage;
+    }
+
     @Override
     public String toString() {
         return "Coupon{" +
                 "couponId=" + couponId +
-                ", discountPercentage='" + discountPercentage + '\'' +
+                ", discountPercentage=" + discountPercentage +
+                ", businessType='" + businessType + '\'' +
+                ", businessName='" + businessName + '\'' +
+                ", couponImage='" + couponImage + '\'' +
                 '}';
     }
 }

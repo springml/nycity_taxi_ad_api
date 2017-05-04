@@ -1,5 +1,7 @@
 package com.springml.nyc.taxi.ad.api;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.GenericUrl;
@@ -11,10 +13,12 @@ import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.json.JsonHttpContent;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.springml.nyc.taxi.ad.api.model.Coupon;
 import com.springml.nyc.taxi.ad.api.model.Prediction;
 import com.springml.nyc.taxi.ad.api.model.Predictions;
 import com.springml.nyc.taxi.ad.api.model.RideDetails;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,12 +26,14 @@ import org.springframework.beans.factory.annotation.Value;
 import javax.annotation.PostConstruct;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Type;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 /**
  * Created by sam on 28/4/17.
@@ -47,36 +53,52 @@ public class AdServer {
     @Value("${cloudML.predict.rest.url}")
     private String predictRestUrl;
 
-    @Value("${coupon.discount.map.file}")
-    private String discountMapFile;
+    @Value("${coupons.json.file}")
+    private String couponsJsonFile;
 
-    private Properties discountProps;
+    private List<Coupon> coupons;
 
     @PostConstruct
     private void initDiscountProperties() throws IOException {
-        discountProps = new Properties();
-        discountProps.load(this.getClass().getClassLoader().getResourceAsStream(discountMapFile));
+        InputStream jsonIs = this.getClass().getClassLoader().getResourceAsStream(couponsJsonFile);
+        String json = IOUtils.toString(jsonIs, Charset.defaultCharset());
 
-        LOG.info("Loaded coupon discount mapping");
-        LOG.info(discountProps.toString());
+        Type listType = new TypeToken<List<Coupon>>() {}.getType();
+        coupons = new ObjectMapper().readValue(json.getBytes(),
+                new TypeReference<List<Coupon>>() {
+        });
+
+        LOG.info("Loaded coupons from " + couponsJsonFile);
+        LOG.info(coupons.toString());
     }
 
-    public int getCoupon(RideDetails rideDetails) {
-        return getPredictedAd(rideDetails);
+    public Coupon getCoupon(RideDetails rideDetails) {
+        int couponId = getCouponId(rideDetails);
+        return getCoupon(couponId);
     }
 
-    public int getDiscount(int couponId) {
-        String discountStr = discountProps.getProperty(Integer.toString(couponId));
-        if (StringUtils.isBlank(discountStr)) {
-            // Defaulting to 5%
-            discountStr = "5";
+    private Coupon getCoupon(int couponId) {
+        for (Coupon coupon : coupons) {
+            if (coupon.getCouponId() == couponId) {
+                return coupon;
+            }
         }
 
-        LOG.info("Discount " + discountStr);
-        return Integer.parseInt(discountStr);
+        // No coupon matches
+        LOG.info("No coupon matches couponId " + couponId);
+
+        return getDefaultCoupon();
     }
 
-    private int getPredictedAd(RideDetails rideDetails) {
+    private Coupon getDefaultCoupon() {
+        Coupon defaultCoupon = new Coupon();
+        defaultCoupon.setCouponId(-1);
+        defaultCoupon.setDiscountPercentage(-1);
+
+        return defaultCoupon;
+    }
+
+    private int getCouponId(RideDetails rideDetails) {
         try {
             GoogleCredential credential = GoogleCredential.getApplicationDefault()
                     .createScoped(Collections.singleton(CLOUDML_SCOPE));

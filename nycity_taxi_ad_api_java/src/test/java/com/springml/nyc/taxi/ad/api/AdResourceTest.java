@@ -58,7 +58,10 @@ public class AdResourceTest {
                 .content(getTestRideDetails()))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(jsonPath("$.coupon_id", is(2)))
-                .andExpect(jsonPath("$.discount_percentage", is(10)));
+                .andExpect(jsonPath("$.discount_percentage", is(10)))
+                .andExpect(jsonPath("$.business_type", is("Oil Change - Auto Maintanance")))
+                .andExpect(jsonPath("$.business_name", is("AutoShop SR")))
+                .andExpect(jsonPath("$.coupon_image", is("http://coupon-service-taxi.image.com/Autoshop_ad.jpg")));
     }
 
     private byte[] getTestRideDetails() throws JsonProcessingException {

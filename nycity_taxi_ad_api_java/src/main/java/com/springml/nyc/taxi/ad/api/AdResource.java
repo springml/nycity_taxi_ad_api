@@ -30,15 +30,10 @@ public class AdResource {
     public @ResponseBody ResponseEntity<Coupon> getCoupon(@RequestBody RideDetails rideDetails) {
         LOG.info("getCoupon request: " + rideDetails);
 
-        int couponId = adServer.getCoupon(rideDetails);
-        int discount = adServer.getDiscount(couponId);
+        Coupon coupon = adServer.getCoupon(rideDetails);
+        LOG.debug("getCoupon response " + coupon);
 
-        Coupon response = new Coupon();
-        response.setCouponId(couponId);
-        response.setDiscountPercentage(discount);
-        LOG.debug("getCoupon response " + response);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(coupon);
     }
 
     /**

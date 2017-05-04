@@ -1,0 +1,79 @@
+[
+  {
+    "coupon_id": 0,
+    "discount_percentage": 5,
+    "business_type": "Restaurant",
+    "business_name": "Manhatten Cafe",
+    "coupon_image": "http://coupon-service-taxi.image.com/restaurant_ad.jpg"
+  },
+  {
+    "coupon_id": 1,
+    "discount_percentage": 2,
+    "business_type": "Hair Salon",
+    "business_name": "SuperHair Cuts",
+    "coupon_image": "http://coupon-service-taxi.image.com/HairSalon_ad.jpg"
+  },
+  {
+    "coupon_id": 2,
+    "discount_percentage": 10,
+    "business_type": "Oil Change - Auto Maintanance",
+    "business_name": "AutoShop SR",
+    "coupon_image": "http://coupon-service-taxi.image.com/Autoshop_ad.jpg"
+  },
+  {
+    "coupon_id": 3,
+    "discount_percentage": 4,
+    "business_type": "Retail",
+    "business_name": "Retail For You",
+    "coupon_image": "http://coupon-service-taxi.image.com/Retail_ad.jpg"
+  },
+  {
+    "coupon_id": 4,
+    "discount_percentage": 5,
+    "business_type": "Financial Services",
+    "business_name": "SJC Tax Pro",
+    "coupon_image": "http://coupon-service-taxi.image.com/FinancialServices_ad.jpg"
+  },
+  {
+    "coupon_id": 5,
+    "discount_percentage": 50,
+    "business_type": "Dry Cleaner",
+    "business_name": "Axis Dry Cleaners",
+    "coupon_image": "http://coupon-service-taxi.image.com/DryCleaners_ad.jpg"
+  },
+  {
+    "coupon_id": 6,
+    "discount_percentage": 20,
+    "business_type": "Coffee Shop",
+    "business_name": "StarPeets Cafe",
+    "coupon_image": "http://coupon-service-taxi.image.com/CoffeeShop_ad.jpg"
+  },
+  {
+    "coupon_id": 7,
+    "discount_percentage": 3,
+    "business_type": "Gas Station",
+    "business_name": "Neighborhood Gas Station",
+    "coupon_image": "http://coupon-service-taxi.image.com/GasStation_ad.jpg"
+  },
+  {
+    "coupon_id": 8,
+    "discount_percentage": 25,
+    "business_type": "Optician",
+    "business_name": "Royal Optician",
+    "coupon_image": "http://coupon-service-taxi.image.com/Optician_ad.jpg"
+  },
+  {
+    "coupon_id": 9,
+    "discount_percentage": 15,
+    "business_type": "Dentist",
+    "business_name": "San Ramon Dental",
+    "coupon_image": "http://coupon-service-taxi.image.com/Dental_ad"
+  },
+  {
+    "coupon_id": 10,
+    "discount_percentage": 10,
+    "business_type": "Pizza Shop",
+    "business_name": "DMC Pizza",
+    "coupon_image": "http://coupon-service-taxi.image.com/PizzaShop_ad.jpg"
+  }
+]
