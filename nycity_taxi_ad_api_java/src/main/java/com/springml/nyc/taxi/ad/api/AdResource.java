@@ -1,6 +1,6 @@
 package com.springml.nyc.taxi.ad.api;
 
-import com.springml.nyc.taxi.ad.api.model.CouponResponse;
+import com.springml.nyc.taxi.ad.api.model.Coupon;
 import com.springml.nyc.taxi.ad.api.model.RideDetails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,20 +19,20 @@ public class AdResource {
     private AdServer adServer;
     @RequestMapping("/")
     public String home() {
-        return "Hello App Engine!";
+        return "Coupon Service is running!";
     }
 
     @RequestMapping(value = "/getCoupon", method = RequestMethod.POST)
-    public @ResponseBody ResponseEntity<CouponResponse> getCoupon(@RequestBody RideDetails rideDetails) {
-        LOG.info("rideDetails : " + rideDetails);
+    public @ResponseBody ResponseEntity<Coupon> getCoupon(@RequestBody RideDetails rideDetails) {
+        LOG.info("getCoupon request: " + rideDetails);
 
         int couponId = adServer.getCoupon(rideDetails);
-        String discount = adServer.getDiscount(couponId);
+        int discount = adServer.getDiscount(couponId);
 
-        CouponResponse response = new CouponResponse();
+        Coupon response = new Coupon();
         response.setCouponId(couponId);
-        response.setDiscount(discount);
-        LOG.debug("Returning " + response);
+        response.setDiscountPercentage(discount);
+        LOG.debug("getCoupon response " + response);
 
         return ResponseEntity.ok(response);
     }
@@ -43,7 +43,7 @@ public class AdResource {
      */
     @RequestMapping("/_ah/health")
     public String healthy() {
-        return "I am Healthy";
+        return "OK";
     }
 
 }

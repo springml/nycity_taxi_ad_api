@@ -27,6 +27,12 @@ public class AdServer {
 
     private static final String CLOUDML_SCOPE =
             "https://www.googleapis.com/auth/cloud-platform";
+    private static final String PASSENGER_COUNT = "passenger_count";
+    private static final String TPEP_PICKUP_DATETIME = "tpep_pickup_datetime";
+    private static final String PICKUP_LATITUDE = "pickup_latitude";
+    private static final String PICKUP_LONGITUDE = "pickup_longitude";
+    private static final String DROPOFF_LATITUDE = "dropoff_latitude";
+    private static final String DROPOFF_LONGITUDE = "dropoff_longitude";
 
     @Value("${cloudML.predict.rest.url}")
     private String predictRestUrl;
@@ -49,15 +55,15 @@ public class AdServer {
         return getPredictedAd(rideDetails);
     }
 
-    public String getDiscount(int couponId) {
-        String discount = discountProps.getProperty(Integer.toString(couponId));
-        if (StringUtils.isBlank(discount)) {
+    public int getDiscount(int couponId) {
+        String discountStr = discountProps.getProperty(Integer.toString(couponId));
+        if (StringUtils.isBlank(discountStr)) {
             // Defaulting to 5%
-            discount = "5%";
+            discountStr = "5";
         }
 
-        LOG.info("Discount " + discount);
-        return discount;
+        LOG.info("Discount " + discountStr);
+        return Integer.parseInt(discountStr);
     }
 
     private int getPredictedAd(RideDetails rideDetails) {
@@ -67,6 +73,7 @@ public class AdServer {
             HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
             HttpRequestInitializer requestInitializer = request -> {
                 credential.initialize(request);
+                //TODO : Use exponential backup
                 request.setReadTimeout(0);
             };
 
@@ -76,58 +83,57 @@ public class AdServer {
             GenericUrl url = new GenericUrl(predictRestUrl);
 
             JacksonFactory jacksonFactory = new JacksonFactory();
-            JsonHttpContent jsonHttpContent = new JsonHttpContent(jacksonFactory, getPayLoad(rideDetails));
+            JsonHttpContent jsonHttpContent = new JsonHttpContent(jacksonFactory, getRideDetailsAsCloudMLRequest(rideDetails));
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
             jsonHttpContent.setWrapperKey("instances");
             jsonHttpContent.writeTo(baos);
-            LOG.info("Executing request... " + baos.toString());
+            LOG.info("Executing CloudML predictions with payload : " + baos.toString());
             HttpRequest request = requestFactory.buildPostRequest(url, jsonHttpContent);
 
             HttpResponse response = request.execute();
-            String content = response.parseAsString();
+            String predictionResponse = response.parseAsString();
 
-            LOG.info("Got the following response from CloudML \n" + content);
-            return getHighestProbabilityIndex(content);
+            LOG.info("CloudML prediction response \n" + predictionResponse);
+            return getCouponWithHighProbability(predictionResponse);
         } catch (Exception e) {
-            LOG.error("Error while executing CloudML", e);
+            LOG.error("Error while getting predictions using CloudML", e);
         }
 
         return -1;
     }
 
-    private List<Map<String, Object>> getPayLoad(RideDetails rideDetails) {
+    private List<Map<String, Object>> getRideDetailsAsCloudMLRequest(RideDetails rideDetails) {
         List<Map<String, Object>> instances = new ArrayList<>();
         Map<String, Object> map = new HashMap<>();
 
-        map.put("passenger_count", rideDetails.getPassengerCount());
-        map.put("tpep_pickup_datetime", rideDetails.getTpepPickupDatetime());
-        map.put("pickup_latitude", rideDetails.getPickupLatitude());
-        map.put("pickup_longitude", rideDetails.getPickupLongitude());
-        map.put("dropoff_latitude", rideDetails.getDropoffLatitude());
-        map.put("dropoff_longitude", rideDetails.getDropoffLongitude());
+        map.put(PASSENGER_COUNT, rideDetails.getPassengerCount());
+        map.put(TPEP_PICKUP_DATETIME, rideDetails.getTpepPickupDatetime());
+        map.put(PICKUP_LATITUDE, rideDetails.getPickupLatitude());
+        map.put(PICKUP_LONGITUDE, rideDetails.getPickupLongitude());
+        map.put(DROPOFF_LATITUDE, rideDetails.getDropoffLatitude());
+        map.put(DROPOFF_LONGITUDE, rideDetails.getDropoffLongitude());
 
         instances.add(map);
         return instances;
     }
 
-    private int getHighestProbabilityIndex(String content) {
+    private int getCouponWithHighProbability(String content) {
         Gson gson = new Gson();
         Predictions predictions = gson.fromJson(content, Predictions.class);
 
         List<Prediction> predictionsList = predictions.getPredictions();
         List<Double> probabilities = predictionsList.get(0).getProbabilities();
-        double max = Double.NEGATIVE_INFINITY;
-        int index = -1;
-        for (int i = 0; i < probabilities.size(); i++) {
+        double maxProbability = Double.NEGATIVE_INFINITY;
+        int couponId = -1;
+        for (int i = 0, size = probabilities.size(); i < size; i++) {
             Double prob = probabilities.get(i);
-            if (prob > max) {
-                max = prob;
-                index = i;
+            if (prob > maxProbability) {
+                maxProbability = prob;
+                couponId = i;
             }
         }
 
-        return index;
+        return couponId;
     }
 }

@@ -40,14 +40,13 @@ public class AdResourceTest {
     public void testHome() throws Exception {
         mockMvc.perform(get("/"))
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(content().string("Hello App Engine!"));
+                .andExpect(content().string("Coupon Service is running!"));
     }
 
     @Test
     public void testHealthCheck() throws Exception {
         mockMvc.perform(get("/_ah/health"))
-                .andExpect(status().is2xxSuccessful())
-                .andExpect(content().string("I am Healthy"));
+                .andExpect(status().is2xxSuccessful());
     }
 
     @Test
@@ -56,8 +55,8 @@ public class AdResourceTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(getTestRideDetails()))
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(jsonPath("$.couponId", is(2)))
-                .andExpect(jsonPath("$.discount", is("10%")));
+                .andExpect(jsonPath("$.coupon_id", is(2)))
+                .andExpect(jsonPath("$.discount_percentage", is(10)));
     }
 
     private byte[] getTestRideDetails() throws JsonProcessingException {

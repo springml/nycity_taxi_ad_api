@@ -4,7 +4,7 @@ import java.util.List;
 
 public class Predictions {
 
-    private List<Prediction> predictions = null;
+    private List<Prediction> predictions;
 
     public List<Prediction> getPredictions() {
         return predictions;

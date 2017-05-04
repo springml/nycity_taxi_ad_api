@@ -2,11 +2,10 @@ package com.springml.nyc.taxi.ad.api.model;
 
 import java.util.List;
 
-
 public class Prediction {
 
-    private List<Double> probabilities = null;
-    private List<Double> logits = null;
+    private List<Double> probabilities;
+    private List<Double> logits;
     private Integer classes;
 
     public List<Double> getProbabilities() {

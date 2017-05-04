@@ -8,14 +8,19 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class RideDetails {
     @JsonProperty("passenger_count")
     private int passengerCount;
+
     @JsonProperty("tpep_pickup_datetime")
     private String tpepPickupDatetime;
+
     @JsonProperty("pickup_latitude")
     private float pickupLatitude;
+
     @JsonProperty("pickup_longitude")
     private float pickupLongitude;
+
     @JsonProperty("dropoff_latitude")
     private float dropoffLatitude;
+
     @JsonProperty("dropoff_longitude")
     private float dropoffLongitude;
 
