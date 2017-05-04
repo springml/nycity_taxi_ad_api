@@ -29,4 +29,11 @@ public interface CustomPipelineOptions extends DataflowPipelineOptions {
     String getCouponServiceUrl();
 
     void setCouponServiceUrl(String value);
+
+    @Description("Fully qualified coupon table name")
+    @Default.String("billion-taxi-rides:advertising.coupon1")
+    @Validation.Required
+    String getCouponTable();
+
+    void setCouponTable(String value);
 }
