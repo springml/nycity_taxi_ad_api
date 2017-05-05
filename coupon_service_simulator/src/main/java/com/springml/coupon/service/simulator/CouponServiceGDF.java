@@ -2,6 +2,7 @@ package com.springml.coupon.service.simulator;
 
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.GenericUrl;
+import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestFactory;
 import com.google.api.client.http.HttpResponse;
@@ -53,12 +54,15 @@ public class CouponServiceGDF {
     private static final String DROPOFF_LONGITUDE = "dropoff_longitude";
     private static final String STR_COMMA = ",";
     private static final String STR_EMPTY = "";
+    public static final String APIKEY_HEADER = "apikey";
 
     private static class CouponServiceClient extends DoFn<TableRow, TableRow> {
         private String couponServiceUrl;
+        private String apiKey;
 
-        CouponServiceClient(String  couponServiceUrl) {
+        CouponServiceClient(String  couponServiceUrl, String apiKey) {
             this.couponServiceUrl = couponServiceUrl;
+            this.apiKey = apiKey;
         }
 
         @Override
@@ -74,10 +78,12 @@ public class CouponServiceGDF {
                 HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
                 HttpRequestFactory requestFactory = httpTransport.createRequestFactory(
                         httpRequest -> {
-                            httpRequest.setConnectTimeout(0);
-                            httpRequest.setReadTimeout(0);
+                            HttpHeaders headers = httpRequest.getHeaders();
+                            headers.set(APIKEY_HEADER, apiKey);
                         });
 
+                LOG.info("couponServiceUrl : " + couponServiceUrl);
+                LOG.info("apiKey : " + apiKey);
                 GenericUrl url = new GenericUrl(couponServiceUrl);
 
                 JacksonFactory jacksonFactory = new JacksonFactory();
@@ -182,7 +188,8 @@ public class CouponServiceGDF {
                 .withCoder(TableRowJsonCoder.of()));
 
         String couponServiceUrl = options.getCouponServiceUrl();
-        datastream.apply("Invoking Coupon Service", ParDo.of(new CouponServiceClient(couponServiceUrl)))
+        String apiKey = options.getApiKey();
+        datastream.apply("Invoking Coupon Service", ParDo.of(new CouponServiceClient(couponServiceUrl, apiKey)))
             .apply(BigQueryIO.Write.named("Write to BigQuery")
                 .withCreateDisposition(BigQueryIO.Write.CreateDisposition.CREATE_IF_NEEDED)
                 .withSchema(getCouponSchema())
