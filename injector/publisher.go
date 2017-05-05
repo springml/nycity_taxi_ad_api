@@ -78,27 +78,20 @@ func (p *bufferedPubsubPublisher) flush() {
 }
 
 func (p *bufferedPubsubPublisher) publish(buf []*pubsub.Message) {
-	if len(buf) == 0 {
+	n := int64(len(buf))
+	if n == 0 {
 		return
 	}
 
-	ctx := context.Background()
-
-	var results []*pubsub.PublishResult
-	for _, m := range buf {
-		r := p.client.Topic(p.topic).Publish(ctx, m)
-		results = append(results, r)
-		pubDebugCounter.Add(publishBacklogKey, 1)
+	pubDebugCounter.Add(publishBacklogKey, n)
+	_, err := p.client.Topic(p.topic).Publish(context.Background(), buf...)
+	if err != nil {
+		log.Printf("Error publishing messages to pubsub: %v", err)
+		pubDebugCounter.Add(failedMsgsKey, n)
 	}
 
-	for _, r := range results {
-		if id, err := r.Get(ctx); err != nil {
-			log.Printf("Error publishing message %s to pubsub: %v", id, err)
-			pubDebugCounter.Add(failedMsgsKey, 1)
-		}
-		pubDebugCounter.Add(publishBacklogKey, -1)
-		pubDebugCounter.Add(sentMsgsKey, 1)
-	}
+	pubDebugCounter.Add(publishBacklogKey, -n)
+	pubDebugCounter.Add(sentMsgsKey, n)
 }
 
 func messagesSent() int {
