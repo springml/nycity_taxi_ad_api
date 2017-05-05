@@ -105,7 +105,7 @@ Dataflow
 
 4. *cd dataflow/nycity_taxi_ad_api/coupon_service_simulator/*
 
-5. Execute *mvn clean compile exec:java -Dexec.mainClass=com.springml.coupon.service.simulator.CouponServiceGDF -e -Dexec.args="--project=billion-taxi-rides --stagingLocation=gs://sml/staging --runner=DataflowPipelineRunner --streaming=true --numWorkers=20 --zone=us-west1-b --couponServiceUrl=https://demo5-test.apigee.net/v1/coupon --apiKey=lgvfwq6XmvzmuA7VwOLWY3VNOnMaI4ES"*
+5. Execute *mvn clean compile exec:java -Dexec.mainClass=com.springml.coupon.service.simulator.CouponServiceGDF -e -Dexec.args="--project=billion-taxi-rides --stagingLocation=gs://sml/staging --runner=DataflowPipelineRunner --streaming=true --numWorkers=20 --zone=us-west1-b --couponServiceUrl=https://demo5-test.apigee.net/v1/coupon --apiKey=API_KEY"*
 
 Scheduler
 
