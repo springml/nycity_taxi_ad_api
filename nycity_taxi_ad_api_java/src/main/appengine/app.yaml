@@ -9,9 +9,3 @@ handlers:
 - url: /.*
   script: this field is required, but ignored
 
-automatic_scaling:
-  min_num_instances: 2
-  max_num_instances: 20 # default value
-  cool_down_period_sec: 120
-  cpu_utilization:
-    target_utilization: 0.5
