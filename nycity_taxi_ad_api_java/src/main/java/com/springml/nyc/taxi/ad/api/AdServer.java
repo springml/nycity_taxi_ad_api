@@ -7,7 +7,6 @@ import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestFactory;
-import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.HttpResponse;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.json.JsonHttpContent;
@@ -49,6 +48,7 @@ public class AdServer {
     private static final String PICKUP_LONGITUDE = "pickup_longitude";
     private static final String DROPOFF_LATITUDE = "dropoff_latitude";
     private static final String DROPOFF_LONGITUDE = "dropoff_longitude";
+    private static final int DEFAULT_COUPON_ID = 2;
 
     @Value("${cloudML.predict.rest.url}")
     private String predictRestUrl;
@@ -77,6 +77,11 @@ public class AdServer {
         return getCoupon(couponId);
     }
 
+
+    public void setPredictRestUrl(String predictRestUrl) {
+        this.predictRestUrl = predictRestUrl;
+    }
+
     private Coupon getCoupon(int couponId) {
         for (Coupon coupon : coupons) {
             if (coupon.getCouponId() == couponId) {
@@ -86,32 +91,31 @@ public class AdServer {
 
         // No coupon matches
         LOG.info("No coupon matches couponId " + couponId);
-
         return getDefaultCoupon();
     }
 
     private Coupon getDefaultCoupon() {
-        Coupon defaultCoupon = new Coupon();
-        defaultCoupon.setCouponId(-1);
-        defaultCoupon.setDiscountPercentage(-1);
-
-        return defaultCoupon;
+        // Default Coupon
+        /**
+         {
+             "coupon_id": 2,
+             "discount_percentage": 10,
+             "business_type": "Oil Change - Auto Maintanance",
+             "business_name": "AutoShop SR",
+             "coupon_image": "http://coupon-service-taxi.image.com/Autoshop_ad.jpg"
+         }
+         */
+        return getCoupon(DEFAULT_COUPON_ID);
     }
 
     private int getCouponId(RideDetails rideDetails) {
+
         try {
             GoogleCredential credential = GoogleCredential.getApplicationDefault()
                     .createScoped(Collections.singleton(CLOUDML_SCOPE));
             HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
-            HttpRequestInitializer requestInitializer = request -> {
-                credential.initialize(request);
-                //TODO : Use exponential backup
-                request.setReadTimeout(0);
-            };
-
             HttpRequestFactory requestFactory = httpTransport.createRequestFactory(
-                    requestInitializer);
-
+                    credential);
             GenericUrl url = new GenericUrl(predictRestUrl);
 
             JacksonFactory jacksonFactory = new JacksonFactory();
@@ -132,7 +136,8 @@ public class AdServer {
             LOG.error("Error while getting predictions using CloudML", e);
         }
 
-        return -1;
+        // Return default coupon in case of error
+        return DEFAULT_COUPON_ID;
     }
 
     private List<Map<String, Object>> getRideDetailsAsCloudMLRequest(RideDetails rideDetails) {
@@ -156,6 +161,7 @@ public class AdServer {
 
         List<Prediction> predictionsList = predictions.getPredictions();
         List<Double> probabilities = predictionsList.get(0).getProbabilities();
+
         double maxProbability = Double.NEGATIVE_INFINITY;
         int couponId = -1;
         for (int i = 0, size = probabilities.size(); i < size; i++) {
