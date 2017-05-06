@@ -93,7 +93,9 @@ public class AdCountStoreManager {
     private Key getEntityKey() {
         Key entityKey;
         java.time.LocalDateTime now = java.time.LocalDateTime.now();
-        String entityName = new StringBuilder(now.getYear()).append("-").append(now.getMonth()).append("-").append(now.getDayOfMonth()).toString();
+        String entityName = new StringBuilder().append(now.getYear())
+                .append("-").append(now.getMonth())
+                .append("-").append(now.getDayOfMonth()).toString();
         entityKey = datastore.newKeyFactory().setKind(kind).newKey(entityName);
         return entityKey;
     }

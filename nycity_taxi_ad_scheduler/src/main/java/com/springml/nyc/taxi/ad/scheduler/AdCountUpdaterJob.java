@@ -160,11 +160,10 @@ public class AdCountUpdaterJob {
     Generates AdDisplayCount query
      */
     private String generateAdDiscountQuery() {
-        String fetchAdDisCountQuery = "SELECT campaign,count(*) as AdCount from (SELECT  count(*), ride_id,\n" +
-                "  campaign,campaign_name\n" +
-                "FROM [billion-taxi-rides:advertising.ride_details]\n" +
-                "where TIMESTAMP(timestamp) >= TIMESTAMP(CURRENT_DATE())\n" +
-                "GROUP BY campaign,ride_id,campaign_name)\n" +
+        String fetchAdDisCountQuery = "SELECT campaign,count(*) as AdCount from (SELECT  campaign,ride_id,  \n" +
+                "FROM [billion-taxi-rides:advertising.taxi_rides]\n" +
+                "WHERE TIMESTAMP(timestamp) >= TIMESTAMP(CURRENT_DATE())\n" +
+                "GROUP BY campaign,ride_id)\n" +
                 "GROUP BY campaign";
         return fetchAdDisCountQuery;
     }
