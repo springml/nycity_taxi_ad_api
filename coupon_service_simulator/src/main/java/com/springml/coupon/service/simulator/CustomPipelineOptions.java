@@ -36,4 +36,11 @@ public interface CustomPipelineOptions extends DataflowPipelineOptions {
     String getCouponTable();
 
     void setCouponTable(String value);
+
+    @Description("Apigee API Ket")
+    @Default.String("lgvfwq6XmvzmuA7VwOLWY3VNOnMaI4ES")
+    @Validation.Required
+    String getApiKey();
+
+    void setapiKey(String value);
 }
