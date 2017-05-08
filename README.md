@@ -95,7 +95,7 @@ This document contains the steps required to configure, build and deploy coupon 
 
 7. Execute *go run *.go*
 
-Dataflow
+### Dataflow
 
 1. Login into Google Cloud Console and select Google Compute Engine from the menu
 
@@ -107,7 +107,7 @@ Dataflow
 
 5. Execute *mvn clean compile exec:java -Dexec.mainClass=com.springml.coupon.service.simulator.CouponServiceGDF -e -Dexec.args="--project=billion-taxi-rides --stagingLocation=gs://sml/staging --runner=DataflowPipelineRunner --streaming=true --numWorkers=20 --zone=us-west1-b --couponServiceUrl=https://demo5-test.apigee.net/v1/coupon --apiKey=API_KEY"*
 
-Scheduler
+### Scheduler
 
 1. Login into Google Cloud Console and select Google Compute Engine from the menu
 
@@ -115,7 +115,7 @@ Scheduler
 
 3. In terminal switch to root user using *sudo su -*
 
-4. *cd scheduler/nycity_taxi_ad_api/nycity_taxi_ad_scheduler/*
+4. *cd scheduler-demo/nycity_taxi_ad_api/nycity_taxi_ad_scheduler/*
 
 5. Execute *java -jar target/nycity-taxi-ad-scheduler-1.0-SNAPSHOT.jar*
 
