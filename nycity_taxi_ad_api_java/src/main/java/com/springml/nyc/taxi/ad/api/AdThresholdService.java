@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import javax.annotation.PostConstruct;
@@ -19,8 +18,6 @@ import javax.annotation.PostConstruct;
  * a)Check if the limit for advertisement display count is reached
  */
 public class AdThresholdService {
-    @Autowired
-    private static AdThresholdService adThresholdService;
 
     private String adThresholdFilename;
     private static Properties adCountThresholdLimitRegistry = new Properties();
@@ -32,24 +29,6 @@ public class AdThresholdService {
     @Value("${coupons.threshold.limit.file}")
     private String adThresholdFileName;
 
-
-    /*
-    Private constructor to implement singleton
-     */
-    private AdThresholdService() {
-
-    }
-
-    /*Singleton implementation as its good enough to have single instance
-    for the scenario
-    */
-    public static synchronized AdThresholdService getInstance() {
-
-        if (adThresholdService == null) {
-            adThresholdService = new AdThresholdService();
-        }
-        return adThresholdService;
-    }
 
     /*Checks if the limit for the ad display count is reached
     */
@@ -67,11 +46,6 @@ public class AdThresholdService {
         return isThresholdExceeded;
     }
 
-
-    public static void main(String[] args) {
-        AdThresholdService adThresholdService = AdThresholdService.getInstance();
-        System.out.println("is Exceeded" + adThresholdService.isAdThresholdExceeded(6));
-    }
 
     /*Ad Threshold limit is read from properties file and loaded in this instance.
     */

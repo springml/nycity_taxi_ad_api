@@ -20,6 +20,7 @@ import com.springml.nyc.taxi.ad.api.model.RideDetails;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import javax.annotation.PostConstruct;
@@ -57,6 +58,10 @@ public class AdServer {
     private String couponsJsonFile;
 
     private List<Coupon> coupons;
+
+    @Autowired
+    private AdThresholdService adThresholdService;
+
 
     @PostConstruct
     private void initDiscountProperties() throws IOException {
@@ -166,7 +171,7 @@ public class AdServer {
         int couponId = -1;
         for (int i = 0, size = probabilities.size(); i < size; i++) {
             Double prob = probabilities.get(i);
-            if (prob > maxProbability) {
+            if (prob > maxProbability && !adThresholdService.isAdThresholdExceeded(i)) {
                 maxProbability = prob;
                 couponId = i;
             }

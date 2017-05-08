@@ -17,4 +17,9 @@ public class AdApiApplication {
     public AdServer adServer() {
         return new AdServer();
     }
+
+    @Bean
+    public AdThresholdService adThresholdService() {
+        return new AdThresholdService();
+    }
 }
