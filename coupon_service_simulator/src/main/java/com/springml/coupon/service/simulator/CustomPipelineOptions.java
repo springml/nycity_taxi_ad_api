@@ -31,7 +31,7 @@ public interface CustomPipelineOptions extends DataflowPipelineOptions {
     void setCouponServiceUrl(String value);
 
     @Description("Fully qualified coupon table name")
-    @Default.String("billion-taxi-rides:advertising.coupon1")
+    @Default.String("billion-taxi-rides:advertising.coupon")
     @Validation.Required
     String getCouponTable();
 

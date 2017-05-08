@@ -14,6 +14,7 @@ import com.google.api.services.bigquery.model.TableRow;
 import com.google.api.services.bigquery.model.TableSchema;
 import com.google.cloud.dataflow.sdk.Pipeline;
 import com.google.cloud.dataflow.sdk.coders.TableRowJsonCoder;
+import com.google.cloud.dataflow.sdk.io.BigQueryIO;
 import com.google.cloud.dataflow.sdk.io.PubsubIO;
 import com.google.cloud.dataflow.sdk.options.PipelineOptionsFactory;
 import com.google.cloud.dataflow.sdk.transforms.DoFn;
@@ -188,12 +189,12 @@ public class CouponServiceGDF {
 
         String couponServiceUrl = options.getCouponServiceUrl();
         String apiKey = options.getApiKey();
-        datastream.apply("Invoking Coupon Service", ParDo.of(new CouponServiceClient(couponServiceUrl, apiKey)));
-//            .apply(BigQueryIO.Write.named("Write to BigQuery")
-//                .withCreateDisposition(BigQueryIO.Write.CreateDisposition.CREATE_IF_NEEDED)
-//                .withSchema(getCouponSchema())
-//                .withWriteDisposition(BigQueryIO.Write.WriteDisposition.WRITE_APPEND)
-//                .to(options.getCouponTable()));
+        datastream.apply("Invoking Coupon Service", ParDo.of(new CouponServiceClient(couponServiceUrl, apiKey)))
+            .apply(BigQueryIO.Write.named("Write to BigQuery")
+                .withCreateDisposition(BigQueryIO.Write.CreateDisposition.CREATE_IF_NEEDED)
+                .withSchema(getCouponSchema())
+                .withWriteDisposition(BigQueryIO.Write.WriteDisposition.WRITE_APPEND)
+                .to(options.getCouponTable()));
 
         p.run();
     }
