@@ -119,3 +119,31 @@ This document contains the steps required to configure, build and deploy coupon 
 
 5. Execute *java -jar target/nycity-taxi-ad-scheduler-1.0-SNAPSHOT.jar*
 
+## Run Taxi Dataflow which will pusblish data into BigQuery
+We have to start injector and dataflow.
+
+### Dataflow
+To start dataflow follow below steps
+
+1. Start sml-tax-dataflow compute-engine and ssh into it
+
+2. sudo su -
+
+3. cd work/dataflow_nyc_taxis_next17_visupipe/dataflow/
+
+4. mvn clean compile exec:java -Dexec.mainClass=com.springml.TaxiGDF -e -Dexec.args="--project=billion-taxi-rides   --sinkProject=billion-taxi-rides --stagingLocation=gs://billion-taxi-rides/df-staging/ --runner=DataflowPipelineRunner --streaming=true --numWorkers=1 --zone=us-west1-b"
+
+5. Check whether the stop successfully started by navigating to https://console.cloud.google.com/dataflow?project=billion-taxi-rides
+
+### Injector
+To start injector follow below steps
+
+1. Start next17keynote-injector compute-engine and ssh into it
+
+2. sudo su -
+
+3. cd nycity_taxi_ad_api/injector/
+
+4. source config_without_docker.bash
+
+5. go run *.go
