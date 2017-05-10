@@ -119,7 +119,7 @@ This document contains the steps required to configure, build and deploy coupon 
 
 5. Execute *java -jar target/nycity-taxi-ad-scheduler-1.0-SNAPSHOT.jar*
 
-## Run Taxi Dataflow which will pusblish data into BigQuery
+## Run Taxi Dataflow which will publish data into BigQuery
 We have to start injector and dataflow.
 
 ### Dataflow
