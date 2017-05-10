@@ -95,7 +95,7 @@ This document contains the steps required to configure, build and deploy coupon 
 
 7. Execute *go run *.go*
 
-Dataflow
+### Dataflow
 
 1. Login into Google Cloud Console and select Google Compute Engine from the menu
 
@@ -107,7 +107,7 @@ Dataflow
 
 5. Execute *mvn clean compile exec:java -Dexec.mainClass=com.springml.coupon.service.simulator.CouponServiceGDF -e -Dexec.args="--project=billion-taxi-rides --stagingLocation=gs://sml/staging --runner=DataflowPipelineRunner --streaming=true --numWorkers=20 --zone=us-west1-b --couponServiceUrl=https://demo5-test.apigee.net/v1/coupon --apiKey=API_KEY"*
 
-Scheduler
+### Scheduler
 
 1. Login into Google Cloud Console and select Google Compute Engine from the menu
 
@@ -119,3 +119,32 @@ Scheduler
 
 5. Execute *java -jar target/nycity-taxi-ad-scheduler-1.0-SNAPSHOT.jar*
 
+
+## Run Taxi Dataflow which will pusblish data into BigQuery
+We have to start injector and dataflow.
+
+### Dataflow
+To start dataflow follow below steps
+
+1. Start sml-tax-dataflow compute-engine and ssh into it
+
+2. sudo su -
+
+3. cd work/dataflow_nyc_taxis_next17_visupipe/dataflow/
+
+4. mvn clean compile exec:java -Dexec.mainClass=com.springml.TaxiGDF -e -Dexec.args="--project=billion-taxi-rides   --sinkProject=billion-taxi-rides --stagingLocation=gs://billion-taxi-rides/df-staging/ --runner=DataflowPipelineRunner --streaming=true --numWorkers=1 --zone=us-west1-b"
+
+5. Check whether the stop successfully started by navigating to https://console.cloud.google.com/dataflow?project=billion-taxi-rides
+
+###Injector
+To start injector follow below steps
+
+1. Start next17keynote-injector compute-engine and ssh into it
+
+2. sudo su -
+
+3. cd nycity_taxi_ad_api/injector/
+
+4. source config_without_docker.bash
+
+5. go run *.go
