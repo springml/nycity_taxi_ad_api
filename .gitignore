@@ -4,3 +4,5 @@ nycity_taxi_ad_api_java/target/
 coupon_service_simulator/target/
 coupon_service_simulator/coupon_service_simulator.iml
 coupon_service_simulator/.idea/
+nycity_taxi_ad_scheduler/.idea/
+nycity_taxi_ad_scheduler/target/
