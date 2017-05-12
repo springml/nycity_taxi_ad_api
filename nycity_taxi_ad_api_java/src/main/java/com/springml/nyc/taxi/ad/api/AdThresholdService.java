@@ -20,7 +20,8 @@ import javax.annotation.PostConstruct;
 public class AdThresholdService {
 
     private String adThresholdFilename;
-    private static Properties adCountThresholdLimitRegistry = new Properties();
+    private Properties adCountThresholdLimitRegistry = new Properties();
+    private AdCountStoreManager adCountStoreManager = AdCountStoreManager.getInstance();
     private static Logger logger =
             Logger.getLogger(AdThresholdService.class.getName());
     //limit current set same for all ads.
@@ -34,7 +35,7 @@ public class AdThresholdService {
     */
     public boolean isAdThresholdExceeded(int advId) {
         boolean isThresholdExceeded = false;
-        int count = AdCountStoreManager.getInstance().getAdUpdateCount(Integer.toString(advId));
+        int count = adCountStoreManager.getAdUpdateCount(Integer.toString(advId));
         long limit = 0;
         Object advIdThreholdProp = adCountThresholdLimitRegistry.getProperty(Integer.toString(advId));
         if (advIdThreholdProp != null) {
@@ -60,6 +61,12 @@ public class AdThresholdService {
             }
         }
 
+    }
+
+    /*Used for junit testing using mocked instance
+     */
+    protected void setAdCountStoreManager(AdCountStoreManager adCountMgr){
+        this.adCountStoreManager = adCountMgr;
     }
 
 }
