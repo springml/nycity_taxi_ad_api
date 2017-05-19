@@ -17,6 +17,7 @@ import com.springml.nyc.taxi.ad.api.model.Coupon;
 import com.springml.nyc.taxi.ad.api.model.Prediction;
 import com.springml.nyc.taxi.ad.api.model.Predictions;
 import com.springml.nyc.taxi.ad.api.model.RideDetails;
+import com.springml.nyc.taxi.ad.datastore.RedeemStoreManager;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -136,7 +137,7 @@ public class AdServer {
             String predictionResponse = response.parseAsString();
 
             LOG.info("CloudML prediction response \n" + predictionResponse);
-            return getCouponWithHighProbability(predictionResponse);
+            return getCouponWithHighProbability(predictionResponse,rideDetails);
         } catch (Exception e) {
             LOG.error("Error while getting predictions using CloudML", e);
         }
@@ -160,7 +161,8 @@ public class AdServer {
         return instances;
     }
 
-    private int getCouponWithHighProbability(String content) {
+    private int getCouponWithHighProbability(String content,RideDetails rideDetails) {
+        RedeemStoreManager redeemStoreMgr = RedeemStoreManager.getInstance();
         Gson gson = new Gson();
         Predictions predictions = gson.fromJson(content, Predictions.class);
 
@@ -171,7 +173,11 @@ public class AdServer {
         int couponId = -1;
         for (int i = 0, size = probabilities.size(); i < size; i++) {
             Double prob = probabilities.get(i);
-            if (prob > maxProbability && !adThresholdService.isAdThresholdExceeded(i)) {
+            RedeemStatus status = redeemStoreMgr.getRedeemStatus(""+couponId,rideDetails.toString());
+            if (prob > maxProbability && !adThresholdService.isAdThresholdExceeded(i) && (!status.equals(RedeemStatus.REDEEMED))){
+                if(status.equals(RedeemStatus.NONEXIST)){
+                    redeemStoreMgr.addCoupon(""+couponId,rideDetails.toString());
+                }
                 maxProbability = prob;
                 couponId = i;
             }

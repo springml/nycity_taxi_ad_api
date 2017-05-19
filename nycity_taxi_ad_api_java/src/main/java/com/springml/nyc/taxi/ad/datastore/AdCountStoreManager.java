@@ -1,8 +1,8 @@
 package com.springml.nyc.taxi.ad.datastore;
 
 
-import autovalue.shaded.org.apache.commons.lang.StringUtils;
 import com.google.cloud.datastore.*;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -15,7 +15,7 @@ import java.util.logging.Logger;
  * The list of operations supported are
  * a)Update entity that corresponds to current day's list of
  * display counts for each ad
- * b)Retreives the current day's display count for the advertisement id
+ * b)Retrieves the current day's display count for the advertisement id
  * passed
  */
 public class AdCountStoreManager {
@@ -30,7 +30,6 @@ public class AdCountStoreManager {
 
     static {
         datastore = DatastoreOptions.getDefaultInstance().getService();
-
     }
 
     /*
@@ -54,8 +53,6 @@ public class AdCountStoreManager {
     using big query
      */
     public void updateAdCountEntity(Properties displayCountResponse) {
-
-
         Key adCountEntityKey = getEntityKey();
         Entity.Builder entityBuilder = Entity.newBuilder(adCountEntityKey);
 

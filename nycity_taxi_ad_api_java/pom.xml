@@ -16,10 +16,24 @@
         <maven.compiler.source>${java.version}</maven.compiler.source> <!-- REQUIRED -->
         <maven.compiler.target>${java.version}</maven.compiler.target> <!-- REQUIRED -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
         <appengine.maven.plugin>1.0.0</appengine.maven.plugin>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-spanner</artifactId>
+            <version>0.13.0-beta</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-datastore</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.google.cloud/google-cloud-spanner -->
+
+
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -52,19 +66,14 @@
             </exclusions>
         </dependency>
 
-        <dependency>
-            <groupId>com.google.cloud</groupId>
-            <artifactId>google-cloud-datastore</artifactId>
-            <version>1.0.0</version>
-        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.google.cloud/google-cloud-spanner -->
 
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
             <version>1.9.5</version>
         </dependency>
-
-
     </dependencies>
 
     <build>
@@ -81,13 +90,11 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- START plugin -->
             <plugin>
                 <groupId>com.google.cloud.tools</groupId>
                 <artifactId>appengine-maven-plugin</artifactId>
                 <version>${appengine.maven.plugin}</version>
             </plugin>
-            <!-- END plugin -->
         </plugins>
     </build>
 </project>
