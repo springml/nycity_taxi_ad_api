@@ -6,3 +6,5 @@ coupon_service_simulator/coupon_service_simulator.iml
 coupon_service_simulator/.idea/
 nycity_taxi_ad_scheduler/.idea/
 nycity_taxi_ad_scheduler/target/
+nycity_taxi_coupon_redeem_server/target
+nycity_taxi_coupon_redeem_server/.idea

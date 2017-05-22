@@ -25,7 +25,6 @@ import java.util.logging.Logger;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-
 /**
  * The scheduler job that runs every configured that gets ad count
  * for every ad for the day from bigquery and stores them in datastore
@@ -46,25 +45,21 @@ public class AdCountUpdaterJob {
         AdCountStoreManager.getInstance().updateAdCountEntity(adCountResponseObjects);
     }
 
-
     public static void main(String args[]) {
         AdCountUpdaterJob updater = new AdCountUpdaterJob();
         updater.updateAdCounts();
         int count = AdCountStoreManager.getInstance().getAdUpdateCount(Integer.toString(9));
         System.out.println("The count for adId 9 is " + count);
-
     }
 
     /*
         Prepares for authorization to build BigQuery Client
     */
-
     private BigQuery createAuthorizedClient() {
         BigQuery bigQueryClient = null;
+
         try {
-
             bigQueryClient = BigQueryOptions.getDefaultInstance().getService();
-
         } catch (Exception exception) {
             logger.severe("Exception while preparing for authorization :" + exception.getMessage());
         }
@@ -85,7 +80,6 @@ public class AdCountUpdaterJob {
         runAdCountQueryAsJob(fetchAdDisCountQuery, bigQueryClient, adDisplayCountResponses);
 
         return adDisplayCountResponses;
-
     }
 
     /*
@@ -97,7 +91,6 @@ public class AdCountUpdaterJob {
         waitForJobCompletion(adDisplayCountJob);
         QueryResponse response = bigQueryClient.getQueryResults(adDisplayCountJob.getJobId());
         processResponse(response, adDisplayCountResponses);
-
     }
 
     /*
@@ -122,7 +115,6 @@ public class AdCountUpdaterJob {
         }
     }
 
-
     /*
            Runs AdCount retreival query without Big query job
          */
@@ -140,7 +132,6 @@ public class AdCountUpdaterJob {
             }
         }
         processResponse(response, adDisplayCountResponses);
-
     }
 
     /*

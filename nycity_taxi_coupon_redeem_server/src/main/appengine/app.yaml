@@ -1,0 +1,11 @@
+runtime: java
+env: flex
+service: coupon-redeem-service
+
+runtime_config:  # Optional
+  jdk: openjdk8
+
+handlers:
+- url: /.*
+  script: this field is required, but ignored
+
