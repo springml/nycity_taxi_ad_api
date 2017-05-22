@@ -70,8 +70,8 @@ public class RedeemStoreManager {
     }
 
     public RedeemStatus getRedeemStatus(String rideId, String adId){
-        try {
-            ReadOnlyTransaction readOnly = getClient().readOnlyTransaction();//readWriteTransaction();
+        try (ReadOnlyTransaction readOnly = getClient().readOnlyTransaction()) { //readWriteTransaction()) {
+
             Struct couponredeemedResult = readOnly.readRow("coupon_ride_ad", Key.of(rideId, adId), Arrays.asList("availed"));
 
             if(couponredeemedResult==null) {
