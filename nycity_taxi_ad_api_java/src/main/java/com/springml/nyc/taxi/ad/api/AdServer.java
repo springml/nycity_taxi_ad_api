@@ -173,13 +173,13 @@ public class AdServer {
         int couponId = -1;
         for (int i = 0, size = probabilities.size(); i < size; i++) {
             Double prob = probabilities.get(i);
-            RedeemStatus status = redeemStoreMgr.getRedeemStatus(""+couponId,rideDetails.toString());
+            RedeemStatus status = redeemStoreMgr.getRedeemStatus(rideDetails.toString(),""+couponId);
             if (prob > maxProbability && !adThresholdService.isAdThresholdExceeded(i) && (!status.equals(RedeemStatus.REDEEMED))){
+                couponId = i;
                 if(status.equals(RedeemStatus.NONEXIST)){
                     redeemStoreMgr.addCoupon(rideDetails.toString(),""+couponId);
                 }
                 maxProbability = prob;
-                couponId = i;
             }
         }
 
