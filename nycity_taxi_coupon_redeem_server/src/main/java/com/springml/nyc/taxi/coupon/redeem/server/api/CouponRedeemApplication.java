@@ -4,7 +4,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 /**
- * Created by kaarthikraaj on 22/5/17.
+ * Spring Boot application's main class
+ *
  */
 
 @SpringBootApplication

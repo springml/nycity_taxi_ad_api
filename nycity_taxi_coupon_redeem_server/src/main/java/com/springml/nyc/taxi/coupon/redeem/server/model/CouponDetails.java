@@ -3,7 +3,7 @@ package com.springml.nyc.taxi.coupon.redeem.server.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Created by sam on 28/4/17.
+ * Represents Coupon redemption request json
  */
 public class CouponDetails {
     @JsonProperty("ride_id")
