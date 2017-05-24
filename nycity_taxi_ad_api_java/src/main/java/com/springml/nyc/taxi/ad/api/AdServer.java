@@ -171,12 +171,12 @@ public class AdServer {
             Double prob = probabilities.get(i);
             RedeemStatus status = redeemStoreMgr.getRedeemStatus(rideDetails.toString(),""+couponId);
             if (prob > maxProbability && !adThresholdService.isAdThresholdExceeded(i) && (!status.equals(RedeemStatus.REDEEMED))){
-                couponId = i;
-                redeemStoreMgr.addCouponTransactionally(rideDetails.toString(),""+couponId,"coupon-"+ UUID.randomUUID());
+                 couponId = i;
                 maxProbability = prob;
             }
         }
-
+        redeemStoreMgr.addCouponTransactionally(rideDetails.toString(),""+couponId,"coupon-"+ UUID.randomUUID());
+        
         return couponId;
     }
 
