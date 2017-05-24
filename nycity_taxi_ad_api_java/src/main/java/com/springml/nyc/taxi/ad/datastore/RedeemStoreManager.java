@@ -28,13 +28,15 @@ public class RedeemStoreManager {
     private final String databaseName = "sml_coupon_redeem_store";
     private DatabaseClient client;
     //Table in the database which has coupon redeem info
-    private final String tableName = "coupon_ride_ad";
+    private final String tableName = "Coupon_Ride_Ad_Redeem";
+    private final String index = "rideid_adid_availed_query_index";
     private static Spanner spanner;
 
     static {
         try {
 
             spanner = SpannerOptions.getDefaultInstance().getService();
+            System.out.println("Spanner initialised");
         } catch (Exception e) {
             LOG.error("Error while initialising RedeemStoreManager");
         }
@@ -58,6 +60,7 @@ public class RedeemStoreManager {
     private DatabaseClient getClient() {
         if (client == null) {
             DatabaseId id = DatabaseId.of(spanner.getOptions().getProjectId(), spannerInstanceId, databaseName);
+            System.out.println("database id is"+id.getDatabase()+id.getName()+id.getInstanceId());
             client = spanner.getDatabaseClient(id);
         }
         return client;
@@ -70,7 +73,7 @@ public class RedeemStoreManager {
     The method is invoked while executing getCoupon service job after the count is retreived
     using big query
      */
-    public boolean addCoupon(String rideId, String adId) {
+    public boolean addCoupon(String rideId, String adId,String couponId) {
         boolean response = false;
         try {
             ArrayList<Mutation> mutations = new ArrayList<Mutation>();
@@ -79,8 +82,13 @@ public class RedeemStoreManager {
                     .to(rideId)
                     .set("ad_Id")
                     .to(adId)
+                    .set("coupon_Id")
+                    .to(couponId)
                     .set("availed")
-                    .to(false).build();
+                    .to(false)
+                    .set("expired")
+                    .to(false)
+                    .build();
             mutations.add(mutuation);
             getClient().write(mutations);
             response = true;
@@ -100,8 +108,29 @@ public class RedeemStoreManager {
      */
     public RedeemStatus getRedeemStatus(String rideId, String adId) {
         try (ReadOnlyTransaction readOnly = getClient().readOnlyTransaction()) { //readWriteTransaction()) {
+            RedeemStatus currentStatus = RedeemStatus.NOTREDEEMED;
 
-            Struct couponredeemedResult = readOnly.readRow("coupon_ride_ad", Key.of(rideId, adId), Arrays.asList("availed"));
+            ResultSet redeemrs = readOnly.readUsingIndex(tableName,index,KeySet.singleKey(Key.of(rideId,adId,true,false)),Arrays.asList("availed"));
+            if(redeemrs.next()){
+                currentStatus = RedeemStatus.REDEEMED;
+                redeemrs.close();
+            }
+            else {
+
+                ResultSet notRedeemedRs = readOnly.readUsingIndex(tableName, index, KeySet.singleKey(Key.of(rideId, adId, false,false)), Arrays.asList("availed"));
+                boolean isDataPresent = notRedeemedRs.next();
+                if(isDataPresent){
+                    currentStatus = RedeemStatus.NOTREDEEMED;
+                }
+                else{
+                    currentStatus = RedeemStatus.NONEXIST;
+                }
+                notRedeemedRs.close();
+            }
+            return currentStatus;
+
+
+            /*Struct couponredeemedResult = readOnly.readRow("coupon_ride_ad", Key.of(rideId, adId), Arrays.asList("availed"));
 
             if (couponredeemedResult == null) {
                 return RedeemStatus.NONEXIST;
@@ -112,7 +141,7 @@ public class RedeemStoreManager {
                 } else {
                     return RedeemStatus.NOTREDEEMED;
                 }
-            }
+            }*/
         } catch (SpannerException exc) {
             LOG.error("Exception while getting redeem status so returning NOT REDEEMED" + exc.getMessage());
             return RedeemStatus.NOTREDEEMED;
@@ -127,7 +156,7 @@ public class RedeemStoreManager {
     Currenty since the readWrite transaction does not give a handler to check the status of transaction
     this method is not used as of now
      */
-    public boolean redeemCoupon(String rideId, String adId) {
+    public void addCouponTransactionally(String rideId, String adId,String couponId) {
         boolean response = false;
 
         TransactionRunner runner = getClient().readWriteTransaction();
@@ -140,6 +169,7 @@ public class RedeemStoreManager {
                 // ensure that the transfer is atomic
                 //
                 // transaction.
+                /*
                 boolean isCouponredeemed = transaction.readRow("coupon_ride_ad", Key.of(rideId, adId), Arrays.asList("availed")).getBoolean("availed");
                 if (!isCouponredeemed) {
                     transaction.buffer(Mutation.newUpdateBuilder(tableName)
@@ -147,19 +177,88 @@ public class RedeemStoreManager {
                             .set("ad_Id").to(adId)
                             .set("availed").to(true).build());
                 }
+            */
+                RedeemStatus currentStatus = RedeemStatus.NOTREDEEMED;
 
+                ArrayList<Mutation> transactions = new ArrayList<Mutation>();
+                ResultSet redeemrs = transaction.readUsingIndex(tableName,index,KeySet.singleKey(Key.of(rideId,adId,true,false)),Arrays.asList("availed"));
+                if(redeemrs.next()){
+                    currentStatus = RedeemStatus.REDEEMED;
+                    redeemrs.close();
+                }
+                else {
+
+                    ResultSet notRedeemedRs = transaction.readUsingIndex(tableName, index, KeySet.singleKey(Key.of(rideId, adId, false,false)), Arrays.asList("availed"));
+                    boolean isDataPresent = notRedeemedRs.next();
+                    if(isDataPresent){
+                        currentStatus = RedeemStatus.NOTREDEEMED;
+                    }
+                    else{
+                        currentStatus = RedeemStatus.NONEXIST;
+                    }
+                    notRedeemedRs.close();
+                }
+                System.out.println("Current status is"+currentStatus);
+
+
+                if(currentStatus.equals(RedeemStatus.NOTREDEEMED)){
+                    // Statement.newBuilder("select column_Id from "+tableName+" where ")
+                    // transaction.executeQuery()
+                    addQueryToExpireCoupon(rideId,adId,transaction,transactions);
+                    addNewCoupon(rideId,adId,couponId,transaction,transactions);
+
+                }
+                else {
+                    if(currentStatus.equals(RedeemStatus.NONEXIST)){
+                        addNewCoupon(rideId,adId,couponId,transaction,transactions);
+                    }
+                    else {
+                        if (currentStatus.equals(RedeemStatus.REDEEMED)) {
+                            return null;
+                        }
+                    }
+                }
+
+
+                transaction.buffer(transactions);
 
                 return null;
             }
 
         });
-        if (runner.getCommitTimestamp() != null)
-            response = true;
-        else {
-            response = false;
-        }
-        return response;
+
     }
+
+    private void addNewCoupon(String rideId,String adId,String couponId,TransactionContext transaction,ArrayList<Mutation> transactions) {
+        transactions.add(Mutation.newInsertBuilder(tableName)
+                .set("ride_Id")
+                .to(rideId)
+                .set("ad_Id")
+                .to(adId)
+                .set("coupon_Id")
+                .to(couponId)
+                .set("availed")
+                .to(false)
+                .set("expired")
+                .to(false)
+                .build());
+    }
+
+    private void addQueryToExpireCoupon(String rideId,String adId,TransactionContext transaction,ArrayList<Mutation> transactions) {
+        ResultSet couponIdRs = transaction.readUsingIndex(tableName,index,KeySet.singleKey(Key.of(rideId,adId,false,false)),Arrays.asList("coupon_Id"));
+        couponIdRs.next();
+        String couponId = couponIdRs.getString("coupon_Id");
+        System.out.println("Coupon received is "+couponId);
+        couponIdRs.close();
+        transactions.add(Mutation.newUpdateBuilder(tableName)
+                .set("ride_Id").to(rideId)
+                .set("ad_Id").to(adId)
+                .set("coupon_Id").to(couponId)
+                .set("availed").to(false)
+                .set("expired").to(true)
+                .build());
+    }
+
 
     /*
     Redeems the coupon
@@ -167,17 +266,18 @@ public class RedeemStoreManager {
     @param adId Advertisement ID which is to be displayed in that ride
     The method is invoked by redeemCoupon service
      */
-    public boolean redeemCouponNonAtomic(String rideId, String adId) {
+    public boolean redeemCouponNonAtomic(String rideId, String adId,String couponId) {
         boolean success = false;
 
         ReadOnlyTransaction readOnly = getClient().readOnlyTransaction();//readWriteTransaction();
-        boolean isCouponredeemed = readOnly.readRow("coupon_ride_ad", Key.of(rideId, adId), Arrays.asList("availed")).getBoolean("availed");
-        if (!isCouponredeemed) {
+        ResultSet isCouponredeemedRs = readOnly.readUsingIndex(tableName,index, KeySet.singleKey(Key.of(rideId, adId,true,false)), Arrays.asList("availed"));
+        if (!isCouponredeemedRs.next()) {
 
             ArrayList<Mutation> mutations = new ArrayList<Mutation>();
             mutations.add(Mutation.newUpdateBuilder(tableName)
                     .set("ride_Id").to(rideId)
                     .set("ad_Id").to(adId)
+                    .set("coupon_Id").to(couponId)
                     .set("availed").to(true).build());
             getClient().write(mutations);
             success = true;
@@ -189,12 +289,21 @@ public class RedeemStoreManager {
 
     public static void main(String s[]) {
         RedeemStoreManager redeemStoreManager = RedeemStoreManager.getInstance();
-        redeemStoreManager.addCoupon("ride-1001", "ad-101");
-        boolean redeemed = redeemStoreManager.redeemCouponNonAtomic("ride-1001", "ad-101");
-        System.out.println("is coupon redeemed first call" + redeemed);
-        redeemed = redeemStoreManager.redeemCouponNonAtomic("ride-1001", "ad-101");
-        System.out.println("is coupon redeemed second call" + redeemed);
-        System.out.println(redeemStoreManager.getRedeemStatus("ride-1002", "ad-101"));
+        // redeemStoreManager.addCoupon("ride-1001", "ad-101","1235");
+        redeemStoreManager.addCouponTransactionally("ride-1013", "ad-101","1234");
+        redeemStoreManager.addCouponTransactionally("ride-1013", "ad-101","1235");
+        redeemStoreManager.addCouponTransactionally("ride-1013", "ad-101","1236");
+
+        // System.out.println("first time"+ redeemStoreManager.redeemCouponNonAtomic("ride-1001", "ad-101","1234"));
+        // System.out.println("second time"+ redeemStoreManager.redeemCouponNonAtomic("ride-1001", "ad-101","1234"));
+
+        //  redeemStoreManager.addCoupon("ride-1001", "ad-101","1234");
+
+        //boolean redeemed = redeemStoreManager.redeemCouponNonAtomic("ride-1001", "ad-101");
+        //System.out.println("is coupon redeemed first call" + redeemed);
+        // redeemed = redeemStoreManager.redeemCouponNonAtomic("ride-1001", "ad-101");
+        // System.out.println("is coupon redeemed second call" + redeemed);
+        // System.out.println(redeemStoreManager.getRedeemStatus("ride-1002", "ad-101"));
 
 
         // System.exit(0);

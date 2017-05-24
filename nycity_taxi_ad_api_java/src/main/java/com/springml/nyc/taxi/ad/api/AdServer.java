@@ -30,11 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by sam on 28/4/17.
@@ -176,13 +172,13 @@ public class AdServer {
             RedeemStatus status = redeemStoreMgr.getRedeemStatus(rideDetails.toString(),""+couponId);
             if (prob > maxProbability && !adThresholdService.isAdThresholdExceeded(i) && (!status.equals(RedeemStatus.REDEEMED))){
                 couponId = i;
-                if(status.equals(RedeemStatus.NONEXIST)){
-                    redeemStoreMgr.addCoupon(rideDetails.toString(),""+couponId);
-                }
+                redeemStoreMgr.addCouponTransactionally(rideDetails.toString(),""+couponId,"coupon-"+ UUID.randomUUID());
                 maxProbability = prob;
             }
         }
 
         return couponId;
     }
+
+
 }
