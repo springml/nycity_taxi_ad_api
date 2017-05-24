@@ -12,6 +12,17 @@ public class CouponDetails {
     @JsonProperty("ad_id")
     private String adId;
 
+    @JsonProperty("coupon_id")
+    private String couponId;
+
+    public String getCouponId() {
+        return couponId;
+    }
+
+    public void setCouponId(String couponId) {
+        this.couponId = couponId;
+    }
+
     public String getRideId() {
         return rideId;
     }
@@ -32,6 +43,7 @@ public class CouponDetails {
     public String toString() {
         return "coupon_Details{" +
                 "ride_id=" + rideId +
+                "coupon_id=" + couponId +
                 ", ad_id='" + adId + '\'' +
                 '}';
     }

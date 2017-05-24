@@ -21,9 +21,11 @@ public class CouponRedeemServer {
         CouponRedeemStatusResponse response = new CouponRedeemStatusResponse();
         String rideId = couponRedeemRequestDetails.getRideId();
         String adId = couponRedeemRequestDetails.getAdId();
+        String couponId = couponRedeemRequestDetails.getCouponId();
         response.setAdId(adId);
         response.setRideId(rideId);
-        response.setRedeemed(redeemStoreManager.redeemCouponNonAtomic(rideId, adId));
+        boolean redeemed = redeemStoreManager.redeemCouponNonAtomic(rideId, adId,couponId);
+        response.setRedeemed(redeemed?"Successfully Redeemed":"Redeem Failed: Coupon Already Redeemed");
         return response;
     }
 }
