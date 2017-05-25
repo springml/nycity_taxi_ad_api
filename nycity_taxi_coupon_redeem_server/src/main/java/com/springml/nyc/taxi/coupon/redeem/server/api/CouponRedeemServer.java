@@ -1,5 +1,6 @@
 package com.springml.nyc.taxi.coupon.redeem.server.api;
 
+import com.springml.nyc.taxi.ad.api.RedeemStatus;
 import com.springml.nyc.taxi.ad.datastore.RedeemStoreManager;
 import com.springml.nyc.taxi.coupon.redeem.server.model.CouponDetails;
 import com.springml.nyc.taxi.coupon.redeem.server.model.CouponRedeemStatusResponse;
@@ -24,8 +25,22 @@ public class CouponRedeemServer {
         String couponId = couponRedeemRequestDetails.getCouponId();
         response.setAdId(adId);
         response.setRideId(rideId);
-        boolean redeemed = redeemStoreManager.redeemCouponNonAtomic(rideId, adId,couponId);
-        response.setRedeemed(redeemed?"Successfully Redeemed":"Redeem Failed: Coupon Already Redeemed");
+        RedeemStatus redeemedStatus = redeemStoreManager.redeemCouponNonAtomic(rideId, adId,couponId);
+        String redeemStatusResponse = "";
+        switch (redeemedStatus){
+            case NONEXIST:
+                redeemStatusResponse = "Redeem Failed: Any of CouponID/RideId/AdId is not valid";
+                break;
+            case ALREADYREDEEMED:
+                redeemStatusResponse = "Redeem Failed:The coupon is already redeemed";
+                break;
+            case REDEEMED_SUCCESSFULLY:
+                redeemStatusResponse = "The coupon is successfully Redeemed";
+
+
+
+        }
+        response.setRedeemed(redeemStatusResponse);
         return response;
     }
 }
