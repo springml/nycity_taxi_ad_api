@@ -176,7 +176,7 @@ public class AdServer {
             }
         }
         redeemStoreMgr.addCouponTransactionally(rideDetails.toString(),""+couponId,"coupon-"+ UUID.randomUUID());
-        
+
         return couponId;
     }
 
