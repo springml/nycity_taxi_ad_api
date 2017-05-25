@@ -25,6 +25,7 @@ public class CouponRedeemServer {
         String couponId = couponRedeemRequestDetails.getCouponId();
         response.setAdId(adId);
         response.setRideId(rideId);
+        response.setCouponId(couponId);
         RedeemStatus redeemedStatus = redeemStoreManager.redeemCouponNonAtomic(rideId, adId,couponId);
         String redeemStatusResponse = "";
         switch (redeemedStatus){
