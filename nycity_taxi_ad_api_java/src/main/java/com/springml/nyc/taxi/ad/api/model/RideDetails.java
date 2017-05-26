@@ -1,6 +1,7 @@
 package com.springml.nyc.taxi.ad.api.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Created by sam on 28/4/17.
@@ -83,4 +84,6 @@ public class RideDetails {
                 ", dropoffLongitude='" + dropoffLongitude + '\'' +
                 '}';
     }
+
+
 }

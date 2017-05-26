@@ -169,7 +169,7 @@ public class AdServer {
         int couponId = -1;
         for (int i = 0, size = probabilities.size(); i < size; i++) {
             Double prob = probabilities.get(i);
-            RedeemStatus status = redeemStoreMgr.getRedeemStatus(rideDetails.toString(),""+couponId);
+            RedeemStatus status = redeemStoreMgr.getRedeemStatus(rideDetails.toString(),""+i);
             if (prob > maxProbability && !adThresholdService.isAdThresholdExceeded(i) && (!status.equals(RedeemStatus.REDEEMED))){
                  couponId = i;
                 maxProbability = prob;

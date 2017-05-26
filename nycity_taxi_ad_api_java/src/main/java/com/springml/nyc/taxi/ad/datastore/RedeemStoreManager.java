@@ -29,6 +29,7 @@ public class RedeemStoreManager {
     private DatabaseClient client;
     //Table in the database which has coupon redeem info
     private final String tableName = "Coupon_Ride_Ad_Redeem";
+    private final String activity_Table_Name = "ReadWriteActivity";
     private final String index = "rideid_adid_availed_query_index";
     private static Spanner spanner;
 
@@ -36,7 +37,7 @@ public class RedeemStoreManager {
         try {
 
             spanner = SpannerOptions.getDefaultInstance().getService();
-            System.out.println("Spanner initialised");
+           // System.out.println("Spanner initialised");
         } catch (Exception e) {
             LOG.error("Error while initialising RedeemStoreManager");
         }
@@ -91,6 +92,7 @@ public class RedeemStoreManager {
                     .build();
             mutations.add(mutuation);
             getClient().write(mutations);
+           // addToActivity(rideId,adId,false);
             response = true;
         } catch (SpannerException exc) {
             LOG.error("Exception while adding coupon entry to redeem store" + exc.getMessage());
@@ -98,6 +100,34 @@ public class RedeemStoreManager {
         }
         return response;
     }
+
+  /*  private void addToActivity(String rideId, String adId, boolean isRead) {
+        ArrayList<String> columns = new ArrayList<String>();
+        Mutation.WriteBuilder builder = Mutation.newInsertOrUpdateBuilder(activity_Table_Name);
+        columns.add("ReadCount");
+        columns.add("WriteCount");
+        Struct rs = getClient().readOnlyTransaction().readRow(activity_Table_Name,Key.of(rideId,adId), columns);
+        long readcount = 0;
+        long writeCount = 0;
+        if(rs!=null) {
+             readcount = rs.getLong("ReadCount");
+             writeCount = rs.getLong("WriteCount");
+            if (isRead) {
+                readcount++;
+            } else {
+                writeCount++;
+            }
+        }
+            Mutation updateMutation = builder.set("ride_Id").to(rideId)
+                    .set("ad_Id").to(adId)
+                    .set("ReadCount").to(readcount)
+                    .set("WriteCount").to(writeCount).build();
+            ArrayList<Mutation> mutations = new ArrayList<Mutation>();
+            mutations.add(updateMutation);
+            getClient().write(mutations);
+        }
+
+*/
 
     /*
     Gets coupon's redeem status
@@ -109,6 +139,7 @@ public class RedeemStoreManager {
     public RedeemStatus getRedeemStatus(String rideId, String adId) {
         try (ReadOnlyTransaction readOnly = getClient().readOnlyTransaction()) { //readWriteTransaction()) {
             RedeemStatus currentStatus = RedeemStatus.NOTREDEEMED;
+           // addToActivity(rideId,adId,true);
 
             ResultSet redeemrs = readOnly.readUsingIndex(tableName,index,KeySet.singleKey(Key.of(rideId,adId,true,false)),Arrays.asList("availed"));
             if(redeemrs.next()){
@@ -182,6 +213,8 @@ public class RedeemStoreManager {
 
                 ArrayList<Mutation> transactions = new ArrayList<Mutation>();
                 ResultSet redeemrs = transaction.readUsingIndex(tableName,index,KeySet.singleKey(Key.of(rideId,adId,true,false)),Arrays.asList("availed"));
+               // addToActivity(rideId,adId,true);
+
                 if(redeemrs.next()){
                     currentStatus = RedeemStatus.REDEEMED;
                     redeemrs.close();
@@ -189,6 +222,8 @@ public class RedeemStoreManager {
                 else {
 
                     ResultSet notRedeemedRs = transaction.readUsingIndex(tableName, index, KeySet.singleKey(Key.of(rideId, adId, false,false)), Arrays.asList("availed"));
+                   // addToActivity(rideId,adId,true);
+
                     boolean isDataPresent = notRedeemedRs.next();
                     if(isDataPresent){
                         currentStatus = RedeemStatus.NOTREDEEMED;
@@ -241,6 +276,8 @@ public class RedeemStoreManager {
                 .set("expired")
                 .to(false)
                 .build());
+       // addToActivity(rideId,adId,false);
+
     }
 
     private void addQueryToExpireCoupon(String rideId,String adId,TransactionContext transaction,ArrayList<Mutation> transactions) {
@@ -256,6 +293,8 @@ public class RedeemStoreManager {
                 .set("availed").to(false)
                 .set("expired").to(true)
                 .build());
+       // addToActivity(rideId,adId,false);
+
     }
 
 
@@ -312,11 +351,11 @@ public class RedeemStoreManager {
 
         //  redeemStoreManager.addCoupon("ride-1001", "ad-101","1234");
 
-        RedeemStatus redeemedStatus = redeemStoreManager.redeemCouponNonAtomic("RideDetails{passengerCount=3, tpepPickupDatetime='2015-01-04 20:00:03', pickupLatitude='40.724983', pickupLongitude='-73.99567', dropoffLatitude='40.76858', dropoffLongitude='-73.86199'}", "7","coupon-21fb989b-7fa7-4f1e-a73c-9a2cf55ece45");
-        System.out.println("is coupon redeemed first call" + redeemedStatus);
-        redeemedStatus = redeemStoreManager.redeemCouponNonAtomic("RideDetails{passengerCount=2, tpepPickupDatetime='2015-01-04 20:00:03', pickupLatitude='40.724983', pickupLongitude='-73.99567', dropoffLatitude='40.76858', dropoffLongitude='-73.86199'}", "7","coupon-21fb989b-7fa7-4f1e-a73c-9a2cf55ece45");
-        System.out.println("is coupon redeemed second call" + redeemedStatus);
-        // System.out.println(redeemStoreManager.getRedeemStatus("ride-1002", "ad-101"));
+       // RedeemStatus redeemedStatus = redeemStoreManager.redeemCouponNonAtomic("RideDetails{passengerCount=3, tpepPickupDatetime='2015-01-04 20:00:03', pickupLatitude='40.724983', pickupLongitude='-73.99567', dropoffLatitude='40.76858', dropoffLongitude='-73.86199'}", "7","coupon-21fb989b-7fa7-4f1e-a73c-9a2cf55ece45");
+       // System.out.println("is coupon redeemed first call" + redeemedStatus);
+      //  redeemedStatus = redeemStoreManager.redeemCouponNonAtomic("RideDetails{passengerCount=2, tpepPickupDatetime='2015-01-04 20:00:03', pickupLatitude='40.724983', pickupLongitude='-73.99567', dropoffLatitude='40.76858', dropoffLongitude='-73.86199'}", "7","coupon-21fb989b-7fa7-4f1e-a73c-9a2cf55ece45");
+       // System.out.println("is coupon redeemed second call" + redeemedStatus);
+         System.out.println(redeemStoreManager.getRedeemStatus("ride-1002", "ad-101"));
 
 
         // System.exit(0);

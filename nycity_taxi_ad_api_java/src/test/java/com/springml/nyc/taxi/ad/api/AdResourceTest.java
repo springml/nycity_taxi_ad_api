@@ -66,11 +66,11 @@ public class AdResourceTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(getTestRideDetails()))
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(jsonPath("$.coupon_id", is(3)))
-                .andExpect(jsonPath("$.discount_percentage", is(4)))
-                .andExpect(jsonPath("$.business_type", is("Retail")))
-                .andExpect(jsonPath("$.business_name", is("Retail For You")))
-                .andExpect(jsonPath("$.coupon_image", is("http://coupon-service-taxi.image.com/Retail_ad.jpg")));
+                .andExpect(jsonPath("$.coupon_id", is(1)))
+                .andExpect(jsonPath("$.discount_percentage", is(2)))
+                .andExpect(jsonPath("$.business_type", is("Hair Salon")))
+                .andExpect(jsonPath("$.business_name", is("SuperHair Cuts")))
+                .andExpect(jsonPath("$.coupon_image", is("http://coupon-service-taxi.image.com/HairSalon_ad.jpg")));
     }
 
     @Test
