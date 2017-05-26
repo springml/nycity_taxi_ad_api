@@ -12,15 +12,15 @@ public class CouponRedeemStatusResponse {
     @JsonProperty("ad_id")
     private String adId;
 
-    @JsonProperty("redeemed")
-    private boolean redeemed;
+    @JsonProperty("redeemedStatus")
+    private String redeemedStatus;
 
-    public boolean isRedeemed() {
-        return redeemed;
+    public String getRedeemedStatus() {
+        return redeemedStatus;
     }
 
-    public void setRedeemed(boolean redeemed) {
-        this.redeemed = redeemed;
+    public void setRedeemed(String redeemed) {
+        this.redeemedStatus = redeemedStatus;
     }
 
     public String getRideId() {
@@ -44,7 +44,7 @@ public class CouponRedeemStatusResponse {
         return "coupon_Details{" +
                 "ride_id=" + rideId +
                 ", ad_id='" + adId + '\'' +
-                ", redeemed='" + redeemed + '\'' +
+                ", redeemed='" + redeemedStatus + '\'' +
 
                 '}';
     }
