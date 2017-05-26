@@ -93,6 +93,7 @@
                 <artifactId>appengine-maven-plugin</artifactId>
                 <version>${appengine.maven.plugin}</version>
             </plugin>
+
         </plugins>
     </build>
 </project>

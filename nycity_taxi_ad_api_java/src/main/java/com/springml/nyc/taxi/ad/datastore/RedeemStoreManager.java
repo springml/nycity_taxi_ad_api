@@ -74,13 +74,13 @@ public class RedeemStoreManager {
         boolean response = false;
         try {
             ArrayList<Mutation> mutations = new ArrayList<Mutation>();
-            Mutation mutuation = Mutation.newInsertBuilder(tableName)
+            Mutation mutuation = Mutation.newInsertOrUpdateBuilder(tableName)
                     .set("ride_Id")
                     .to(rideId)
                     .set("ad_Id")
                     .to(adId)
-                    .set("availed")
-                    .to(false).build();
+                    .set("redeem_Count")
+                    .to(0).build();
             mutations.add(mutuation);
             getClient().write(mutations);
             response = true;
@@ -101,13 +101,13 @@ public class RedeemStoreManager {
     public RedeemStatus getRedeemStatus(String rideId, String adId) {
         try (ReadOnlyTransaction readOnly = getClient().readOnlyTransaction()) { //readWriteTransaction()) {
 
-            Struct couponredeemedResult = readOnly.readRow("coupon_ride_ad", Key.of(rideId, adId), Arrays.asList("availed"));
+            Struct couponredeemedResult = readOnly.readRow("coupon_ride_ad", Key.of(rideId, adId), Arrays.asList("redeem_Count"));
 
             if (couponredeemedResult == null) {
                 return RedeemStatus.NONEXIST;
             } else {
-                boolean redeemed = couponredeemedResult.getBoolean("availed");
-                if (redeemed) {
+                long redeemCount = couponredeemedResult.getLong("redeem_Count");
+                if (redeemCount>0) {
                     return RedeemStatus.REDEEMED;
                 } else {
                     return RedeemStatus.NOTREDEEMED;
@@ -140,12 +140,15 @@ public class RedeemStoreManager {
                 // ensure that the transfer is atomic
                 //
                 // transaction.
-                boolean isCouponredeemed = transaction.readRow("coupon_ride_ad", Key.of(rideId, adId), Arrays.asList("availed")).getBoolean("availed");
-                if (!isCouponredeemed) {
-                    transaction.buffer(Mutation.newUpdateBuilder(tableName)
-                            .set("ride_Id").to(rideId)
-                            .set("ad_Id").to(adId)
-                            .set("availed").to(true).build());
+                Struct couponredeemedStruct = transaction.readRow("coupon_ride_ad", Key.of(rideId, adId), Arrays.asList("redeem_Count"));
+                if(couponredeemedStruct!=null) {
+                    long couponRedeemCount = couponredeemedStruct.getLong("redeem_Coupon");
+                    if (couponRedeemCount==0) {
+                        transaction.buffer(Mutation.newUpdateBuilder(tableName)
+                                .set("ride_Id").to(rideId)
+                                .set("ad_Id").to(adId)
+                                .set("redeem_Count").to(couponRedeemCount+1).build());
+                    }
                 }
 
 
@@ -167,34 +170,44 @@ public class RedeemStoreManager {
     @param adId Advertisement ID which is to be displayed in that ride
     The method is invoked by redeemCoupon service
      */
-    public boolean redeemCouponNonAtomic(String rideId, String adId) {
-        boolean success = false;
+    public RedeemStatus redeemCouponNonAtomic(String rideId, String adId) {
+        RedeemStatus status = RedeemStatus.NONEXIST;
 
         ReadOnlyTransaction readOnly = getClient().readOnlyTransaction();//readWriteTransaction();
-        boolean isCouponredeemed = readOnly.readRow("coupon_ride_ad", Key.of(rideId, adId), Arrays.asList("availed")).getBoolean("availed");
-        if (!isCouponredeemed) {
+        Struct couponRedeemedStruct = readOnly.readRow("coupon_ride_ad", Key.of(rideId, adId), Arrays.asList("redeem_Count"));
+        if(couponRedeemedStruct!=null) {
+            long redeemCount = couponRedeemedStruct.getLong("redeem_Count");
+            if (redeemCount == 0) {
 
-            ArrayList<Mutation> mutations = new ArrayList<Mutation>();
-            mutations.add(Mutation.newUpdateBuilder(tableName)
-                    .set("ride_Id").to(rideId)
-                    .set("ad_Id").to(adId)
-                    .set("availed").to(true).build());
-            getClient().write(mutations);
-            success = true;
+                ArrayList<Mutation> mutations = new ArrayList<Mutation>();
+                mutations.add(Mutation.newUpdateBuilder(tableName)
+                        .set("ride_Id").to(rideId)
+                        .set("ad_Id").to(adId)
+                        .set("redeem_Count").to(redeemCount+1).build());
+                getClient().write(mutations);
+                status = RedeemStatus.REDEEMED_SUCCESSFULLY;
+            }
+            else{
+                status = RedeemStatus.ALREADY_REDEEMED;
+            }
+            readOnly.close();
         }
-        readOnly.close();
-        LOG.info("coupon redemption succeed? " + success);
-        return success;
+        else{
+            status = RedeemStatus.NONEXIST;
+        }
+
+        LOG.info("coupon redemption succeed? " + status);
+        return status;
     }
 
     public static void main(String s[]) {
         RedeemStoreManager redeemStoreManager = RedeemStoreManager.getInstance();
-        redeemStoreManager.addCoupon("ride-1001", "ad-101");
-        boolean redeemed = redeemStoreManager.redeemCouponNonAtomic("ride-1001", "ad-101");
+        redeemStoreManager.addCoupon("ride-101601", "ad-101");
+        RedeemStatus redeemed = redeemStoreManager.redeemCouponNonAtomic("ride-101601", "ad-101");
         System.out.println("is coupon redeemed first call" + redeemed);
-        redeemed = redeemStoreManager.redeemCouponNonAtomic("ride-1001", "ad-101");
+        redeemed = redeemStoreManager.redeemCouponNonAtomic("ride-101601", "ad-101");
         System.out.println("is coupon redeemed second call" + redeemed);
-        System.out.println(redeemStoreManager.getRedeemStatus("ride-1002", "ad-101"));
+        System.out.println(redeemStoreManager.getRedeemStatus("ride-101601", "ad-101"));
 
 
         // System.exit(0);

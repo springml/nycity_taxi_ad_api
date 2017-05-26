@@ -80,7 +80,9 @@ public class AdServer {
 
     public Coupon getCoupon(RideDetails rideDetails) {
         int couponId = getCouponId(rideDetails);
-        return getCoupon(couponId);
+         Coupon coupon = getCoupon(couponId);
+         coupon.setRide_Id(rideDetails.toString());
+         return coupon;
     }
 
 
@@ -173,7 +175,8 @@ public class AdServer {
         int couponId = -1;
         for (int i = 0, size = probabilities.size(); i < size; i++) {
             Double prob = probabilities.get(i);
-            RedeemStatus status = redeemStoreMgr.getRedeemStatus(rideDetails.toString(),""+couponId);
+            RedeemStatus status = redeemStoreMgr.getRedeemStatus(rideDetails.toString(),""+i);
+            LOG.info("The status for ad Id "+i+" is"+status);
             if (prob > maxProbability && !adThresholdService.isAdThresholdExceeded(i) && (!status.equals(RedeemStatus.REDEEMED))){
                 couponId = i;
                 if(status.equals(RedeemStatus.NONEXIST)){
