@@ -37,7 +37,7 @@ public class CouponRedeemServer {
                 respMsg = "Failed -> Coupon doesnot exist";
 
         }
-        response.setRedeemed(respMsg);
+        response.setRedeemedStatus(respMsg);
         return response;
     }
 }
