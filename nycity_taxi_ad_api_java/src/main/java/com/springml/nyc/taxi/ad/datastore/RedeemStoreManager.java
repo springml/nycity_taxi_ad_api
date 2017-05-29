@@ -202,12 +202,13 @@ public class RedeemStoreManager {
 
     public static void main(String s[]) {
         RedeemStoreManager redeemStoreManager = RedeemStoreManager.getInstance();
-        redeemStoreManager.addCoupon("ride-101601", "ad-101");
+       /* redeemStoreManager.addCoupon("ride-101601", "ad-101");
         RedeemStatus redeemed = redeemStoreManager.redeemCouponNonAtomic("ride-101601", "ad-101");
         System.out.println("is coupon redeemed first call" + redeemed);
-        redeemed = redeemStoreManager.redeemCouponNonAtomic("ride-101601", "ad-101");
-        System.out.println("is coupon redeemed second call" + redeemed);
-        System.out.println(redeemStoreManager.getRedeemStatus("ride-101601", "ad-101"));
+        */
+        RedeemStatus redeemed = redeemStoreManager.redeemCouponNonAtomic("RideDetails{passengerCount=4, tpepPickupDatetime='2015-01-04 02:06:55', pickupLatitude='41.851055', pickupLongitude='-74.99421', dropoffLatitude='42.749996', dropoffLongitude='-73.979004'}", "3");
+        System.out.println("is coupon redeemed  ?" + redeemed);
+       // System.out.println(redeemStoreManager.getRedeemStatus("ride-101601", "ad-101"));
 
 
         // System.exit(0);

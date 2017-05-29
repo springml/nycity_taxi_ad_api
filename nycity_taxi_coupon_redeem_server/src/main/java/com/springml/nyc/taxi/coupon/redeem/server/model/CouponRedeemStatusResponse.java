@@ -19,7 +19,7 @@ public class CouponRedeemStatusResponse {
         return redeemedStatus;
     }
 
-    public void setRedeemed(String redeemed) {
+    public void setRedeemedStatus(String redeemedStatus) {
         this.redeemedStatus = redeemedStatus;
     }
 
