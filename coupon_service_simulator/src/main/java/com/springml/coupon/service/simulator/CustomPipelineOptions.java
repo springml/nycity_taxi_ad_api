@@ -9,6 +9,13 @@ import com.google.cloud.dataflow.sdk.options.Validation;
  * Options class for SML Simulator GDF
  */
 public interface CustomPipelineOptions extends DataflowPipelineOptions {
+    @Description("Redeem Coupon URl which will be used for coupon redemption")
+    @Default.String("https://coupon-redeem-service-dot-billion-taxi-rides.appspot.com/redeemCoupon")
+    @Validation.Required
+    String getRedeemCouponServiceUrl();
+
+    void setRedeemCouponServiceUrl(String value);
+
     @Description("ProjectId where data source topic lives")
     @Default.String("billion-taxi-rides")
     @Validation.Required
@@ -36,6 +43,13 @@ public interface CustomPipelineOptions extends DataflowPipelineOptions {
     String getCouponTable();
 
     void setCouponTable(String value);
+
+    @Description("Fully qualified redeem coupon statistics table name")
+    @Default.String("billion-taxi-rides:advertising.redeem_coupon_statistics")
+    @Validation.Required
+    String getRedeemCouponTable();
+
+    void setRedeemCouponTable(String value);
 
     @Description("Apigee API Ket")
     @Default.String("lgvfwq6XmvzmuA7VwOLWY3VNOnMaI4ES")

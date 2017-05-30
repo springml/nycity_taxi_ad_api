@@ -1,25 +1,37 @@
 package com.springml.coupon.service.simulator.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.gson.annotations.SerializedName;
 
 /**
  * Created by sam on 2/5/17.
  */
 public class Coupon {
-    @JsonProperty("coupon_id")
+    @SerializedName("coupon_id")
     private int couponId;
 
-    @JsonProperty("discount_percentage")
+    @SerializedName("ride_id")
+    private String rideId;
+
+    @SerializedName("discount_percentage")
     private int discountPercentage;
 
-    @JsonProperty("business_type")
+    @SerializedName("business_type")
     private String businessType;
 
-    @JsonProperty("business_name")
+    @SerializedName("business_name")
     private String businessName;
 
-    @JsonProperty("coupon_image")
+    @SerializedName("coupon_image")
     private String couponImage;
+
+    public String getRideId() {
+        return rideId;
+    }
+
+    public void setRideId(String rideId) {
+        this.rideId = rideId;
+    }
 
     public int getCouponId() {
         return couponId;
@@ -69,6 +81,7 @@ public class Coupon {
                 ", businessType='" + businessType + '\'' +
                 ", businessName='" + businessName + '\'' +
                 ", couponImage='" + couponImage + '\'' +
+                ", rideId='" + rideId +'\''+
                 '}';
     }
 }
