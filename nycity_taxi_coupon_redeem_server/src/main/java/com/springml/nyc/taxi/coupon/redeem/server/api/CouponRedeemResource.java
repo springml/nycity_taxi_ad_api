@@ -3,6 +3,7 @@ package com.springml.nyc.taxi.coupon.redeem.server.api;
 import com.springml.nyc.taxi.ad.datastore.RedeemStoreManager;
 import com.springml.nyc.taxi.coupon.redeem.server.model.CouponDetails;
 import com.springml.nyc.taxi.coupon.redeem.server.model.CouponRedeemStatusResponse;
+import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * Rest controller class for redeem coupon service
@@ -18,13 +20,15 @@ import org.springframework.web.bind.annotation.RestController;
  */
 
 @RestController
+@Api(value="Coupon Redeem Service", description="Redeem the coupon")
 public class CouponRedeemResource {
     @Autowired
     CouponRedeemServer couponRedeemServer;
 
     /* defines home page url
      */
-    @RequestMapping("/")
+    @ApiIgnore
+    @RequestMapping(value = "/", method = RequestMethod.GET)
     public String home() {
         return "Coupon Redeem Service is running!";
     }
