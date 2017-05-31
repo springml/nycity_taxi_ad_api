@@ -200,6 +200,23 @@ public class RedeemStoreManager {
         return status;
     }
 
+    /*
+      Delete coupon information
+      @param  rideId Ride id that contains details like pickup,drop location,no of passengers etc
+      @param adId Advertisement ID which is to be displayed in that ride
+      The method is invoked while executing junit test for redeem coupon service
+       */
+    public void deleteCoupon(String rideId, String adId) {
+        try {
+            ArrayList<Mutation> mutations = new ArrayList<Mutation>();
+            Mutation mutuation = Mutation.delete(tableName,Key.of(rideId,adId));
+            mutations.add(mutuation);
+            getClient().write(mutations);
+        } catch (SpannerException exc) {
+            LOG.error("Exception while deleting coupon entry from redeem store" + exc.getMessage());
+        }
+    }
+
     public static void main(String s[]) {
         RedeemStoreManager redeemStoreManager = RedeemStoreManager.getInstance();
         redeemStoreManager.addCoupon("ride-101601", "ad-101");
