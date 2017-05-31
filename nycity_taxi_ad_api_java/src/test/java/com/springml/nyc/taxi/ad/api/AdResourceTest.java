@@ -59,7 +59,7 @@ public class AdResourceTest {
                 .andExpect(status().is2xxSuccessful());
     }
 
-  /*  @Test
+    @Test
     public void testGetCoupon() throws Exception {
         adServer.setPredictRestUrl(VALID_PREDICT_SERVICE_URL);
         mockMvc.perform(post("/getCoupon")
@@ -72,7 +72,7 @@ public class AdResourceTest {
                 .andExpect(jsonPath("$.business_name", is("Retail For You")))
                 .andExpect(jsonPath("$.coupon_image", is("http://coupon-service-taxi.image.com/Retail_ad.jpg")));
     }
-*/
+
     @Test
     public void testDefaultCouponOnError() throws Exception {
         adServer.setPredictRestUrl(INVALID_PREDICT_SERVICE_URL);
@@ -90,7 +90,7 @@ public class AdResourceTest {
     private byte[] getTestRideDetails() throws JsonProcessingException {
         RideDetails rideDetails = new RideDetails();
         rideDetails.setPassengerCount(4);
-        rideDetails.setTpepPickupDatetime("2015-01-04 02:06:55");
+        rideDetails.setTpepPickupDatetime("2015-01-05 02:06:55");
         rideDetails.setPickupLatitude(41.851056671142578f);
         rideDetails.setPickupLongitude(-74.994209289550781f);
         rideDetails.setDropoffLatitude(42.749996185302734f);
