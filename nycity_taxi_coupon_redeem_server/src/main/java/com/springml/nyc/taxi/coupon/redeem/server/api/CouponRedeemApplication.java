@@ -40,7 +40,7 @@ public class CouponRedeemApplication {
                         "http://www.apache.org/licenses/LICENSE-2.0"))
                 .select()
                 .apis(RequestHandlerSelectors.any())
-                .paths(PathSelectors.any())
+                .paths(PathSelectors.regex("^/(?!error|autoconfig|beans|configprops|dump|info|mappings|trace|env|metrics).*$"))
                 .build();
     }
 }
