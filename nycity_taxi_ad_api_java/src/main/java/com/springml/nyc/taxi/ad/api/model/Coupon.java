@@ -21,6 +21,17 @@ public class Coupon {
     @JsonProperty("coupon_image")
     private String couponImage;
 
+    @JsonProperty("ride_id")
+    private String ride_Id;
+
+    public String getRide_Id() {
+        return ride_Id;
+    }
+
+    public void setRide_Id(String ride_Id) {
+        this.ride_Id = ride_Id;
+    }
+
     public int getCouponId() {
         return couponId;
     }

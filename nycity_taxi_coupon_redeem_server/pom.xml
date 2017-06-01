@@ -5,32 +5,23 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.springml</groupId>
-    <artifactId>nycity-taxi-ad-api</artifactId>
+    <artifactId>nycity_taxi_coupon_redeem_server</artifactId>
     <version>1.0.0</version>
-
-    <name>nycity-taxi-ad-api</name>
-    <description>Taxi demo with Ad API</description>
 
     <properties>
         <java.version>1.8</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source> <!-- REQUIRED -->
         <maven.compiler.target>${java.version}</maven.compiler.target> <!-- REQUIRED -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
         <appengine.maven.plugin>1.0.0</appengine.maven.plugin>
     </properties>
 
     <dependencies>
-
-        <dependency>
-            <groupId>com.google.cloud</groupId>
-            <artifactId>google-cloud-datastore</artifactId>
-            <version>1.0.1</version>
-        </dependency>
-
         <dependency>
             <groupId>com.google.cloud</groupId>
             <artifactId>google-cloud-spanner</artifactId>
-            <version>0.17.2-beta</version>
+            <version>0.13.0-beta</version>
         </dependency>
 
         <dependency>
@@ -52,19 +43,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <version>1.5.3.RELEASE</version>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>  <!-- declare the exclusion here -->
-                    <groupId> com.vaadin.external.google</groupId>
-                    <artifactId>android-json</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger2</artifactId>
             <version>2.7.0</version>
@@ -80,6 +58,18 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
             <version>1.9.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <version>1.5.3.RELEASE</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>  <!-- declare the exclusion here -->
+                    <groupId> com.vaadin.external.google</groupId>
+                    <artifactId>android-json</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
@@ -102,7 +92,6 @@
                 <artifactId>appengine-maven-plugin</artifactId>
                 <version>${appengine.maven.plugin}</version>
             </plugin>
-
         </plugins>
     </build>
 </project>

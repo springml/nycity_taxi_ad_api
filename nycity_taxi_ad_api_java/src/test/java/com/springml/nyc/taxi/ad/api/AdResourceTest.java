@@ -90,7 +90,7 @@ public class AdResourceTest {
     private byte[] getTestRideDetails() throws JsonProcessingException {
         RideDetails rideDetails = new RideDetails();
         rideDetails.setPassengerCount(4);
-        rideDetails.setTpepPickupDatetime("2015-01-04 02:06:55");
+        rideDetails.setTpepPickupDatetime("2015-01-05 02:06:55");
         rideDetails.setPickupLatitude(41.851056671142578f);
         rideDetails.setPickupLongitude(-74.994209289550781f);
         rideDetails.setDropoffLatitude(42.749996185302734f);
