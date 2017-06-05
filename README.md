@@ -147,3 +147,11 @@ To start injector follow below steps
 4. source config_without_docker.bash
 
 5. go run *.go
+
+### Contact
+ SpringML contact: mayank.sharma@springml.com
+ Google Contact : alankho@google.com
+
+### link
+ Link to Presentation :  https://docs.google.com/presentation/d/1Yc7eZ-CkHmsyxWAOHHGFt5q_llA5nyYv1vWlvbjeA_g/edit#slide=id.g2072fb2c8a_0_0
+ Link to Demo Script : https://docs.google.com/document/d/1xvFpnJTPJKtdI2JSr6RHzQDviPnfEcA-oNa5Tr_QaS8/edit#
